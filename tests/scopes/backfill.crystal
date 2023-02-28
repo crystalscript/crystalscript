@@ -1,0 +1,12 @@
+// === neg test: backfill - impossible
+
+public function impossible() {
+    const x = fn1();
+
+    function fn1() {
+        return x;
+    }
+    return err(0);
+}
+// EXPECT: UndeterminedTypeError
+

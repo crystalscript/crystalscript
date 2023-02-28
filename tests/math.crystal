@@ -1,0 +1,42 @@
+public function math1() {
+    const d1 = 20 / 2 / 5;    
+    const d2 = 4 + 30 / 10;
+    const d3 = (10 + 30) / 10;
+    const m1 = 9 * u7 * 2;
+    const m2 = -1 * 7;
+    const p1 = u1 + 20 + u3;
+    const p2 = (u1 + -2);
+    const p3 = u3 + (- 2);
+    const x = 7 ^ 11;
+    const x2 = xor(7,11);
+    const po1 = 2 ** 3;
+    const po2 = pow(2,3);
+    const mm1 = 1 + 11 % 3;
+    const mm2 = mod(u11,u3);
+    const sq1 = sqrti(u16);
+    const l1 = log2(16);
+    
+    return ok(
+        { i: [
+            [ d1, 2 ],
+            [ d2, 7 ],
+            [ d3, 4 ],
+            [ m1, 126 ],
+            [ m2, -7 ],
+            [ p2, -1 ],
+            [ p3, 1 ],
+            [ x, 12 ],
+            [ x2, 12 ],
+            [ po1, 8 ],
+            [ po2, 8 ],
+            [ mm1, 3 ],
+            [ l1, 4 ],
+        ], u: [
+            [ p1, u24 ],
+            [ mm2, u2 ],
+            [ sq1, u4 ],
+        ]}
+    );
+}
+// TEST: math1() => ok: var r=true; val.i.value.concat(val.u.value).forEach((v,idx) => { if (v.value[0].value != v.value[1].value) { console.log(`Index ${idx+1} mismatch ${v.value[0].value} <=> ${v.value[1].value}`); r=false; }}); r==true;
+

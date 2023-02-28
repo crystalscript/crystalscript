@@ -1,0 +1,9 @@
+
+define trait compute {
+    public function cv(int, int) => response<int,>,
+    public function fv(int, int) => response<int,>,
+};
+
+define trait same-name {
+    public function same-name() => response<bool,bool>,
+};

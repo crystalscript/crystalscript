@@ -1,0 +1,14 @@
+
+public function size-issue() {
+    const listx = [
+        //longer string works:
+        //   { a:1, b:"abde", d: { v:u1000 } },
+        // shorter string as first element causes clarity size error:
+        { a:1, b:"abd", d: { v:u1000 } },
+        { a:2, b:"efg", d: { v:u5 } },
+        { a:3, b:"hijk", d: { v:u1 } }
+    ];
+    return ok(lisx);
+}
+// EXPECT: SizeError
+

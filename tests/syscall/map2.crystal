@@ -1,0 +1,15 @@
+//=== neg test: fn with closure not allowed as mapping function
+function map-limitations() {
+    const factor = 2;
+    const x = map(fnx, [1,2,3]);    
+    function fnx(n int) {
+        const nfactor = 3;
+        function work() {
+            return n * factor;
+        }
+        return work();
+    }
+    return err(x);    
+}
+
+// EXPECT: NotSupportedError

@@ -1,0 +1,10 @@
+
+// check syscall
+function f1() {
+    const concat = 4;
+    return 2;
+}
+
+// EXPECT: AlreadyDeclaredError
+
+          

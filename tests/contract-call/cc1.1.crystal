@@ -1,0 +1,4 @@
+public function hello-times2(n int) {
+    return ok(n+n);
+}
+// TEST: hello-times2(2) => ok: val==4

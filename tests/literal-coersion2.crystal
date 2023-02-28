@@ -1,0 +1,10 @@
+// coersion of literal from int to uint
+
+public function test(x uint) {
+    if (x < 10) {
+        return err(-1);
+    }
+    return ok(true);
+}
+
+// EXPECT: success

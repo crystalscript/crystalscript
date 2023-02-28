@@ -1,0 +1,6 @@
+function just-why!() {
+    const amt = u3;
+    const x = as-max-len?("abc", amt);
+    return x;
+}
+// EXPECT: SyntaxError

@@ -1,0 +1,11 @@
+public function test-optional(str string[10]) {
+    const z = as-max-len?(optional(str), optional(u10));
+    const y = as-max-len?(
+        concat(str, "def"),
+        _countof(str)
+    );
+    return y == none ? err(none) : ok(#y);
+    //return ok(unwrap!(y, err(none)));
+}
+// TEST: test-optional(u"abc") => ok: val=="abcdef"
+// TEST: test-optional(u"abcdefhij") => err: val===null

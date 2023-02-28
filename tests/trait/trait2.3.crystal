@@ -1,0 +1,16 @@
+
+// import contract that defines the name-lookup trait
+import .trait22 from "./trait22.import" as trait22;
+
+// import the contract that defines the compute trait needed by
+// name-lookup.byid
+import .mycontract2 from "./mycontract2.import" as mycontract2;
+
+// implement name-lookup trait
+implement trait trait22.name-lookup;
+
+public function byid(a int, contract trait<mycontract2.compute>) {
+    const r = contract.fv(a, 0);
+    return r.okval > 0 ? ok(optional("solvent")) : ok(none);
+}
+

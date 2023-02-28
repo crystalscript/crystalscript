@@ -1,0 +1,56 @@
+public function merge1(buf buff[5]) {
+    const a = {
+        index: 1,
+        item: {
+            buf: 0x01
+        }
+    };
+    const b = {
+        index: u2,
+        buffer: buf
+    };
+    return ok(merge(a,b));
+}
+// TEST: merge1(0x02) => ok: val.index.value == 2 && val.buffer.value == "0x02"
+
+
+persist map_x as { index:int, str:string[2] } => { name: string[10] };
+
+public function merge2_set(index int, name string[10]) {
+    map_x[{index:index, str:"aa"}] = { name:name };
+    return ok(true);
+}
+
+private function merge2p(idx int, nickname string[5]) {
+    const item = map_x[{index:idx, str:"aa"}];
+    const rtn = item==none ? none : merge(item, { nickname: nickname });
+    return rtn;
+}
+
+public function merge2(idx int, nickname string[5]) {
+    if (idx < 0) {
+        return err(none);
+    }
+    else {
+        1+1;
+        return ok( merge2p(idx, nickname) );
+    }
+}
+// TEST: merge2_set(99, u"frederick") => ok: val==true
+// TEST: merge2(99, u"fred") => ok: val.value.name.value=="frederick" && val.value.nickname.value=="fred"
+
+
+public function merge3() {
+    const a = { a: 1 };
+    const b = { a: 2 };
+    return ok(merge(a, optional(b)));
+}
+// TEST: merge3() => ok: val.a.value==2
+
+
+public function merge4() {
+    const a = { a: 1, b: 2 };
+    const b = { a: optional(2) };
+    return ok(merge(a, b));  // 'a' flips to optional<int>
+}
+// TEST: merge4() => ok: val.a.value.value==2

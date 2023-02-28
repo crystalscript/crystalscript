@@ -1,0 +1,17 @@
+
+// defines trait "name-trait"
+import .mycontract from "./mycontract.import" as mycontract;
+
+// implements "name-trait"
+import ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.trait13
+    from "./trait13.import" as trait13-contract;
+
+public function callme(contract trait<mycontract.name-trait>, str string[5]) {
+    return contract.name(str);
+}
+
+public function call-indirect(str string[5]) {
+    return callme(trait13-contract, str);
+}
+// TEST: call-indirect(u"z-abc") => ok:val=="12345"
+

@@ -1,0 +1,24 @@
+
+
+public function fn() {
+    const b = true;
+    const nb = false;
+    const i = 10;
+    const u = u1010;
+    const n = none;
+    const s = "hello";
+    const s2 = "peanut"+"butter";
+
+    const buf = 0xA1B2D3F4153657;
+    const list2 = [ ["a"], ["b","c"] ];
+    const e = err(true);
+    const o = ok(optional(3));
+
+    const mymap = { k1:1, k2:"abc", k3:tx-sender, k5:u99, k6:false, k7:0x5600, k8:{ boo:"boo"} };
+
+    const rel_contract_addr = .some-fn;
+    const abs_contract_addr = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.some-fun;
+    const stx_addr = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P;
+
+    return ok(true);
+}

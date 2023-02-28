@@ -1,0 +1,8 @@
+public function fn1() {
+    return err("ab");
+}
+
+public readonly function fn2() {
+    return ok(fn1().errval + "bc");
+}
+// TEST: fn2() => ok: val=="abbc"

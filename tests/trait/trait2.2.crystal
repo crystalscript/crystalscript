@@ -1,0 +1,12 @@
+
+// load trait "compute"
+import .mycontract2 from "./mycontract2.import" as mycontract2;
+
+
+// define a new trait that requires a 'compute' trait implementation
+// as an argument
+
+define trait name-lookup {
+    public function byid(int, trait<mycontract2.compute>) => response<optional string[10],>,
+};
+

@@ -1,0 +1,8 @@
+
+persist amt as uint with initial-value = u10;
+persist amt as uint with initial-value = u10;
+
+
+// EXPECT: AlreadyDeclaredError
+
+          

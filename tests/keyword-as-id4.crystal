@@ -1,0 +1,9 @@
+public function maptest() {
+    const mymap = {
+        bool: true,
+        int: 3,
+        string: "abc"
+    };
+    return ok(mymap.int);
+}
+// EXPECT: Error

@@ -1,0 +1,27 @@
+// ==== 'fold' syscall using operator, funcs
+
+
+function fold_test_1(a int, b uint) {
+    return uint(a) + uint(b);
+}
+
+public function work(n int) {
+    if (n==1) {
+        return ok(uint(fold(*, [2,2,2], 1)));
+    }
+    else {
+        return ok(fold(fold_test_1, [1,2,3], u5));
+    }
+}
+// TEST: work(1) => ok: val==8
+// TEST: work(2) => ok: val==11
+
+public function fold-optional() {
+    function myfunc(a int, b int) {
+        return a*b;
+    }
+    fold(myfunc, [ 1,2,3 ], optional(1));
+    return ok(fold(myfunc, optional([1,2,3]), 1));
+}
+// TEST: fold-optional() => ok: val == 6
+

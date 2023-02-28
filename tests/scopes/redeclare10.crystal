@@ -1,0 +1,13 @@
+
+public function fn(a uint) {
+    const amt = u1000;
+    function fn2() {
+        // this function will become global, so allowed
+        const amt = u2000;
+        return amt;
+    }
+    return ok(fn2());
+}
+
+// TEST: fn(u1) => ok: val==2000
+

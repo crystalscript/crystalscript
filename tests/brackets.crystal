@@ -1,0 +1,86 @@
+
+const data = {
+    a:1,
+    b:"abc",
+    c:0x0102
+};
+
+persist saved_data as
+{ index:string[2] } => {
+    amt:{
+        stx:uint,
+        name:string[10]
+    }
+};
+
+
+
+public readonly function bracket1() {
+    return ok(data["b"]);
+}
+// TEST: bracket1() => ok:val=="abc"
+
+
+public function bracket2() {
+    saved_data[{ index:"A1" }] = {
+        amt: {
+            stx:100,
+            name: data.b
+        }
+    };
+    
+    return ok(saved_data[{ index:"A1" }].amt);
+}
+// TEST: bracket2() => ok: val.value.stx.value==100 && val.value.name.value == "abc"
+
+public function bracket3(x optional uint) {
+    if (x == none) { return err(x); }
+    if (x <= 5) {
+        return ok(data.c);
+    }
+    else {
+        return ok(0xFFFF);
+    }
+}
+
+public function pass-to-3(x uint) {
+    return bracket3(x);
+}
+// TEST: bracket3(none) => err: val==null
+// TEST: pass-to-3(u2) => ok: val=="0x0102"
+
+
+public function deref-lists(i uint, j optional uint) {
+    const ll = [ [1,2], [3,4,5] ];
+    if (j) {
+        return ok(ll[i][j]);
+    }
+    return err(ll[i]);
+}
+// TEST: deref-lists(u1, none) => err: val[0].value==3 && val[1].value==4
+// TEST: deref-lists(u1, (some u2)) => ok: val==5
+
+
+
+
+// literal map
+public function maps-as-func-args() {
+    const mymap_outer = { k1:1, k2:"k1", k3:tx-sender, kx:0x5600, kb:{ boo:"boo"} };
+
+    // ;; optional map as arg
+    function xmap(mymap optional {k1:int}, x optional int) {
+        if (x != none) {
+            const y = 1 - uint(x);
+            return mymap_outer["k1"];
+        }
+        return 2;
+    }
+    
+    // ;; func call with map literal as arg
+    function xmap2() {
+        return xmap({k1:1}, 1);
+    }
+        
+    return ok(xmap2());
+}
+// TEST: maps-as-func-args() => ok: val==1

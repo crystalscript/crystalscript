@@ -1,0 +1,5 @@
+// "just use none"
+
+const n2 = optional(none);
+
+// EXPECT: SyntaxError

@@ -1,0 +1,9 @@
+
+public function cr2(uint count) {
+   const mv = [!true, true];
+   function fn(uint y) {
+      return y * count;
+   }
+   if (true) { return fn(2); }
+   else { return fn(3); }
+}

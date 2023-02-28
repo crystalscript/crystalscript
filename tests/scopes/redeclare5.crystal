@@ -1,0 +1,14 @@
+
+persist amt as uint with initial-value = u10;
+
+function f1() {
+    function f2() {
+        const amt = 1;
+        return 1;
+    }
+    return 2;
+}
+
+// EXPECT: AlreadyDeclaredError
+
+          

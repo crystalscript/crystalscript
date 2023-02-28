@@ -1,0 +1,9 @@
+
+function fn1() {
+    return 1;
+}
+
+function fn1() {
+    return 2;
+}
+// EXPECT: AlreadyDeclaredError

@@ -1,0 +1,11 @@
+
+public function none_is_none() {
+    return ok({ a:none == none, b: none != none });
+}
+// TEST: none_is_none() => ok: val.a.value===true && val.b.value===false
+
+
+public function isnone(a string[5]) {
+    return ok(a == none);
+}
+// TEST: isnone(u"a") => ok: val===false

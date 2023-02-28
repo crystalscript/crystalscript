@@ -1,0 +1,22 @@
+public function basiclen() {
+    const l1 = len("abc");
+    const l2 = len(0x01020304);
+    const l3 = len([ 1, 2, 3]);
+    const l4 = len(optional([ 1, 2, 3]));
+    return ok([ l1, l2, l3, l4 ]);
+}
+
+// TEST: basiclen() => ok: val[0].value==3 && val[1].value==4 && val[2].value==3 && val[3].value== 3
+
+public function xlen() {
+    const l1 = len(concat("abc","123"));
+    const l2 = len(append([ 1, 2 ], 99));
+    return ok({l1:l1, l2:l2 });
+}
+// TEST: xlen() => ok: val.l1.value==6 && val.l2.value==3
+
+public function olen(str optional string[5]) {
+    return ok(len(str));
+}
+// TEST: olen((some u"alice")) => ok: val==5
+

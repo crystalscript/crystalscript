@@ -1,0 +1,13 @@
+
+import ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.mycontract
+    from "./mycontract.import" as mycontract;
+
+implement trait mycontract.name-trait;
+
+public function name(str string[10]) {
+    return ok("boo");
+}
+// TEST: name(u"op") => ok:val=="boo"
+
+
+

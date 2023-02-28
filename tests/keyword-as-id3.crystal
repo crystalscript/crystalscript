@@ -1,0 +1,5 @@
+function xyz2(i int) {
+    const bool=5;
+    return bool;
+}
+// EXPECT: Error

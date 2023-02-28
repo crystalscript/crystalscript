@@ -1,0 +1,4 @@
+function bad() {
+    1 < none;
+}
+// EXPECT: TypeMismatchError

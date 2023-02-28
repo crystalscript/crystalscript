@@ -1,0 +1,4 @@
+define trait name-trait {
+    public function name(string[10]) => response<string[5], uint>,
+};
+

@@ -1,0 +1,57 @@
+
+import .cc11 from "./cc11.import" as basic1;
+
+import ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.cc11 from
+       "./cc11.import" as basic1_1;
+
+declare extern ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.cc11 as basic1_2 {
+    public function hello-times2(int) => response<int,>
+};
+
+declare extern .cc11 as basic1_3 {
+    public function hello-times2(int) => response<int,>
+};
+
+
+
+public function hello-import-rel-bracket(n int) {
+    const result = contract-call?(basic1["hello-times2"], n);
+    return result;
+}
+// TEST: hello-import-rel-bracket(3) => ok:val==6
+
+public function hello-import-full-direct(n int) {
+    const result = basic1_1.hello-times2(n);
+    return result;
+}
+// TEST: hello-import-full-direct(-4) => ok:val==-8
+
+public function hello-declare-rel(n int) {
+    const result = basic1_2["hello-times2"](n);
+    return result;
+}
+// TEST: hello-declare-rel(5) => ok: val==10
+
+public function hello-declare-full(n int) {
+    const result = basic1_3.hello-times2(n);
+    return result;
+}
+// TEST: hello-declare-full(10) => ok: val==20
+
+
+
+public function hello2(n int) { 
+    const result = contract-call?(basic1.hello-times2, n);
+    // ;; iserr() is never true
+    if (result.iserr() || 2+2 < 4) {
+        // ;; neither is this
+        if (1+1 >= 4) {
+            return contract-call?(basic1.hello-times2, 1); // ;; nop
+        }
+    }
+    1-1;
+    return ok(result.okval * 2);
+}
+// TEST: hello2(5) => ok: val==20
+
+

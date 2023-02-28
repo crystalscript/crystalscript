@@ -1,0 +1,9 @@
+
+public function writer(b bool) {
+    if (b) { return err(0); }
+    else { return ok(1); }
+}
+public readonly function reader() {
+    return writer(true);
+}
+// EXPECT: ReadOnlyViolationError

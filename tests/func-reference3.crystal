@@ -1,0 +1,7 @@
+// Neg test: function references cannot be optional
+function fn() {
+    return 1;
+
+}
+const fnf = optional(fn);
+// EXPECT: SyntaxError

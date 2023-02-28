@@ -1,0 +1,17 @@
+// trait implementation directly without contract 'import'
+
+implement trait .mycontract.name-trait;
+
+public function name(str string[10]) {
+    if (str > "n") {
+        return ok("12345");
+    }
+    else {
+        return err(u0);
+    }
+}
+// EXPECT: NotSupportedError
+
+
+
+

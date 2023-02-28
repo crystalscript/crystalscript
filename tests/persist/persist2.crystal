@@ -1,0 +1,36 @@
+persist simple_index1 as int => string[10];
+persist simple_index2 as int => { name:string[10] };
+
+
+public function getname(n int) {
+    return ok(n % 2 == 0 ?
+              simple_index1[n] :
+              simple_index2[n].name
+             );
+}
+
+public function setname(n int, name string[10]) {
+    if (n % 2 == 0) {
+        return ok(simple_index1[n] = name);
+    }
+    else {
+        return ok(simple_index2[n] = { name:name });
+    }
+}
+
+public function isnone(n int) {
+    const name = getname(n);
+    if (is-err(name)) {
+        // ;; never occurs
+        return err(true);
+    }
+    return ok(name.okval == none);
+}
+
+// TEST: setname(0, u"alice") => ok: val==true
+// TEST: setname(1, u"joe") => ok: val==true
+// TEST: getname(0) => ok: val.value=="alice"
+// TEST: getname(1) => ok: val.value=="joe"
+// TEST: getname(99) => ok: val==null
+// TEST: isnone(99) => ok: val==true
+// TEST: isnone(1) => ok: val==false

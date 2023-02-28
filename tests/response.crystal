@@ -1,0 +1,68 @@
+// returns response<,int>
+function justerr() {
+    return err(1);
+}
+
+// returns response<int,>
+function justok() {
+    return ok(2);
+}
+
+// returns response<bool,bool>
+function both(b bool) {
+    return b ? ok(b) : err(b);
+}
+
+
+public function resp1() {
+    const r = justerr();
+    if (1<2 && r.isok()) {
+        print("ok");
+        return ok(r.okval);
+    }
+    else if (r.iserr()) {
+        print("err");
+        return ok(r.errval);
+    }
+    return err(false);
+}
+// TEST: resp1() => ok: val==1
+
+public function resp2() {
+    const r = justok();
+    if (1<=2 && r.isok()) {
+        print("ok");
+        return ok(r.okval);
+    }
+    else if (r.iserr()) {
+        print("err");
+        return ok(r.errval);
+    }
+    return err(false);
+}
+// TEST: resp2() => ok: val==2
+
+public function resp3() {
+    const r = justok();
+    return r.isok() ? r : err(false);
+}
+// TEST: resp3() => ok: val==2
+
+public function resp4(b bool) {
+    const r = both(b);
+    return r.isok() ? ok(! r.okval) : ok(! r.errval);
+}
+// TEST: resp4(true) => ok: val==false
+// TEST: resp4(false) => ok: val==true
+
+public function resp5(b bool) {
+    const r = both(b);
+    if (r.isok()) {
+        return r;
+    }
+    else {
+        return r;
+    }
+}
+// TEST: resp5(true) => ok: val==true
+// TEST: resp5(false) => err: val==false

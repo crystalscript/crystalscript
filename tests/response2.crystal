@@ -1,0 +1,13 @@
+public function returns(n int) {
+    return n<10 ? ok(true) : err(false);
+}
+
+public function handler() {
+    const r1 = returns(0);
+    const r2 = returns(20);
+    if (r1.isok()) {
+        return ok(r1.okval);
+    }
+    return err(false);
+}
+// TEST: handler() => ok: val===true

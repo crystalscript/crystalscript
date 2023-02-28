@@ -1,0 +1,19 @@
+
+public function ixof(i optional int, s optional string[2]) {
+    const lst = [
+        { a: 1, s:"ab" },
+        { a: 2, s:"cd" }
+    ];
+    const m = index-of(lst, { a:i, s:s });
+    return m ? ok(int(m)) : ok(-1);
+}
+// TEST: ixof((some 1),(some u"ab")) => ok: val==0
+// TEST: ixof((some 1),(some u"XX")) => ok: val==-1
+
+public function ixof2() {
+    const l = 0x01020304;
+    return ok(index-of(l, optional(0x02)));
+}
+// TEST: ixof2() => ok: val.value==1
+
+    

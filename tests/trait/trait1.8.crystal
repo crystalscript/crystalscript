@@ -1,0 +1,14 @@
+
+// implements name-trait
+import .trait15 from "./trait15.import" as impl-contract;
+
+// has a function 'callme', which requires a name-trait argument
+import .trait16 from "./trait16.import" as trait16;
+
+public function callme-wrapper(str string[5]) {
+    trait16.callme(impl-contract, str);
+}
+
+// we expect this to fail because impl-contract implemented name-trait using an abolsute contract id, whereas 'callme' is expecting a relative contract id
+
+// EXPECT: AmbiguousContractIdentifier

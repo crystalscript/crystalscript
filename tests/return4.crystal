@@ -1,0 +1,11 @@
+//=== neg test: not all paths return
+public function min(a uint, b uint) {
+    if (a <= b) {
+        if (a < b) { return ok(u99); }
+    }
+    else {
+        return ok(b);
+    }
+}
+// EXPECT: SyntaxError
+

@@ -1,0 +1,7 @@
+//=== neg test: public functions must return ok or err
+public function fn1() {
+    return 1;
+}
+// EXPECT: TypeMismatchError
+
+

@@ -1,0 +1,17 @@
+public function filt1() {
+    const l = [ 1, 2, 3];
+    function gt2(v int) {
+        return v>2;
+    }
+    return ok(filter(gt2, l));
+}
+// TEST: filt1() => ok: val[0].value==3
+
+public function filt2() {
+    const s = "abcd";
+    function b_or_c(s string[1]) {
+        return (s=="b" || s=="c");
+    }
+    return ok(filter(b_or_c, s));
+}
+// TEST: filt2() => ok: val == "bc";

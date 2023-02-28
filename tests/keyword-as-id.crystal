@@ -1,0 +1,6 @@
+//=== neg test: functions named after a keyword
+function tx-sender(int a) {
+    return a*2;
+}
+
+// EXPECT: Error

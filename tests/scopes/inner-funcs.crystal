@@ -1,0 +1,50 @@
+public function scope1() {
+    const a = { a:1 };
+    function geta() {
+        return a.a;
+    }
+    return ok(geta());
+}
+// TEST: scope1() => ok: val==1
+
+
+public function scope3(cmp buff[2]) {
+    const a = 2;
+    const b = -2;
+    function factor1() {
+        function arg() {
+            return 1;
+        }
+        function factor2() {
+            return a * 3 * scope1().okval * arg();
+        }
+        return b * factor2();
+    }
+    if (cmp == 0x0F0A) {
+        return ok(factor1());
+    }
+    else {
+        return err(0);
+    }
+}
+// TEST: scope3(0x0F0A) => ok: val==-12
+
+
+// ;; scoping: inner function shoudn't be renamed
+public function scope-name-overlap() {
+    function inner-1() {
+        return "i-1";
+    }
+
+    function inner-2() {
+        function inner-1() {
+            return "i-2-1";
+        }
+        return inner-1();
+    }
+    return ok(inner-2()); // should return "i-2-1"
+}
+// TEST: scope-name-overlap() => ok: val=="i-2-1"
+
+
+

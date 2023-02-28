@@ -1,0 +1,5 @@
+// keyword as id
+function xyz(if int) {
+    return 9;
+}
+// EXPECT: Error

@@ -1,0 +1,12 @@
+
+// in clarity you can't override a previous definition
+
+const amt = u1000;
+
+function fn(amt uint) {
+    return 1+1;
+}
+
+// EXPECT: AlreadyDeclaredError
+
+

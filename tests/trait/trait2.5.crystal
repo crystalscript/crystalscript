@@ -1,0 +1,15 @@
+
+// import name-lookup:byid() implementation
+import .trait23 from "./trait23.import" as trait23;
+
+// import compute implementation
+import .trait24 from "./trait24.import" as trait24;
+
+
+public function call-byid(n int) {
+    // => response<optional string[7],>
+    return trait23.byid(n, trait24);
+}
+
+// TEST: call-byid(100) => ok: val.value=="solvent"
+// TEST: call-byid(-10) => ok: val===null

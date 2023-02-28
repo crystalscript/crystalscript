@@ -1,0 +1,8 @@
+// === neg test: use of undeclared id
+function undecl() {
+    const y = x * 3;
+    const x = 2;
+    return err(x);
+}
+
+// EXPECT: UndeclaredIdentifierError

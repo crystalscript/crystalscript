@@ -1,0 +1,13 @@
+
+private function me() {
+    return tx-sender;
+}
+
+public function test() {
+    const p = as-contract(me());
+    return ok(p);
+}
+
+// test for "STX_ADDRESS.CONTRACT_NAME"
+
+// TEST: test() => ok: /^S[^\.]+\.[a-z0-9-]+/.test(val)

@@ -1,0 +1,5 @@
+// test func ref. it's not recursion, but also not allowed
+function m1() {
+    return ok({m1:m1});
+}
+// EXPECT: NotSupportedError

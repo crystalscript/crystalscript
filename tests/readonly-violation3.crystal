@@ -1,0 +1,5 @@
+
+public readonly function one() {
+    return ok(1);
+}
+// TEST: one() => ok: val==1

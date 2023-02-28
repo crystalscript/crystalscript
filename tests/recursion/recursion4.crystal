@@ -1,0 +1,17 @@
+function fn1() {
+    const x = fn2();
+    const factor = first();
+    function fn2() {
+        const y = x + 1;
+        const z = y * factor;
+        return 0;
+    }
+    return err(x);
+}
+
+function first() {
+    return ok(5);
+}
+
+// this should succeed due to y and z being optimized away
+// EXPECT: success

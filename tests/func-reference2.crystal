@@ -1,0 +1,13 @@
+//=== neg test: function reference in const
+
+function x(n int) {
+    return n*2;
+}
+
+function bad() {
+    const fx = x;
+    return map(x, [1, 2]);
+}
+// EXPECT: NotSupportedError
+
+

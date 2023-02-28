@@ -1,0 +1,44 @@
+const x = 4;
+public readonly function factor() {
+    return ok(u5);
+}
+
+const ftxsupply = uint(x) + factor().okval * 1000;
+
+persist ftx as fungible-token with total-supply=ftxsupply;
+persist ftx2 as fungible-token with unlimited-supply;
+
+
+public function getbal(p principal) {
+    const bal = ft-get-balance( ftx, p );
+    const sup = ft-get-supply( ftx ); // circulating supply
+    return ok({ balance:bal, supply:sup });
+}
+// TEST: getbal('SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val.balance.value == 0 && val.supply.value == 0
+
+
+public function ftx-mint(amt uint, p principal) {
+    const r = worker(amt);
+    function worker(amt uint) {
+        const r = ft-mint?(ftx, amt, p);
+        return r;
+    }
+    if (r.isok()) {
+        return getbal(p);
+    }
+    return err(r.errval);
+}
+// TEST: ftx-mint(u200, 'SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val.balance.value == 200 && val.supply.value == 200
+
+
+public function ftx-burn(amt uint, p principal) {
+    const r =
+          ft-burn?(ftx, amt -1, p);
+    const siphon =
+          ft-transfer?(ftx, u1, p, SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB);
+    return r.isok() && siphon.isok() ? getbal(p) : err(r.errval);
+}
+// TEST: ftx-burn(u100, 'SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val.balance.value == 100 && val.supply.value == 101
+// TEST: getbal('SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB) => ok: val.balance.value == 1
+
+

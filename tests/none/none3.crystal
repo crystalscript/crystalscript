@@ -1,0 +1,5 @@
+function bad() {
+    const n = optional(none);
+    return n;
+}
+// EXPECT: SyntaxError

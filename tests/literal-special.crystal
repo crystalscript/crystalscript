@@ -1,0 +1,13 @@
+public function xyz() {
+    const caller = contract-caller;
+    const sender = tx-sender;
+    const h = block-height;
+    const bh = burn-block-height;
+    const ls = stx-liquid-supply;
+    const debug = is-in-regtest;
+    print({ h:h, ls:ls, debug:debug });
+    return ok( caller == sender );
+}
+
+// TEST: xyz() => ok: val===true
+

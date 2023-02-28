@@ -1,0 +1,6 @@
+function f1() {
+   f1();
+   return false;
+}
+
+// EXPECT: RecursionError

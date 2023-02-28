@@ -1,0 +1,12 @@
+public function fn1(lst list<list<int>[2]>[5]) {
+    const cur = [ 1, 2 ];
+    return ok(append(lst, cur));
+}
+
+// TEST: fn1((list (list 3 4))) => ok: val.length==2 && val[1].value[0].value==1 && val[1].value[1].value==2
+
+
+public function fn2(item optional int) {
+    return ok(append([1,2,3], item));
+}
+// TEST: fn2((some 4)) => ok:val.length==4

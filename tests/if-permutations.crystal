@@ -1,0 +1,198 @@
+//
+// if permutations with and without multiple body stmts
+//
+
+public function if-ret-no(n int) {
+    // ;; if: then returns, no else
+    if (n==0) {
+        return ok({ n:n, ythen:true, val:"abc" });
+    }
+    if (n==1) {
+        const val = "a"+"bc";
+        if (val == "abc") {
+            return ok({ n:n, ythen:false, val:val });
+        }
+        return ok({ n:n, ythen:false, val:"-" });
+    }
+    return err({ n:n });
+}
+// TEST: if-ret-no(0) => ok: val.n.value==0 && val.val.value=="abc"
+// TEST: if-ret-no(1) => ok: val.n.value==1 && val.ythen.value===false && val.val.value=="abc"
+// TEST: if-ret-no(2) => err: val.n.value==2
+
+
+public function if-ret-ret(n int, ythen bool) {
+    // if: then returns, else returns
+    if (n==0) {
+        if (ythen) {
+            return ok(true);
+        }
+        else {
+            return ok(true);
+        }
+    }
+    if (n==1) {
+        if (ythen) {
+            "a"+"bc";
+            return ok(true);
+        }
+        else {
+            "a"+"bc";
+            return ok(false);
+        }
+    }
+    return err(ythen);
+}
+// TEST: if-ret-ret(0,true) => ok: val==true
+// TEST: if-ret-ret(0,false) => ok: val==true
+// TEST: if-ret-ret(1,true) => ok: val==true
+// TEST: if-ret-ret(1,false) => ok: val==false
+// TEST: if-ret-ret(2, false) => err: val==false
+
+
+public function if-ret-cont(n int, ythen bool) {
+    // if: then returns, else continues
+    if (n==0) {
+        if (ythen) {
+            return ok("a"+"b"+"c");
+        }
+        else {
+            9 * 9;
+        }
+        return ok("n0");
+    }
+    if (n==1) {
+        if (ythen) {
+            return ok("a"+"bc");
+        }
+        else {
+            "a"+"bc";
+            9 * 9;
+        }
+        return ok("n1");
+    }
+    return err("nx");
+}
+// TEST: if-ret-cont(0,true) => ok: val=="abc"
+// TEST: if-ret-cont(0,false) => ok: val=="n0"
+// TEST: if-ret-cont(1,true) => ok: val=="abc"
+// TEST: if-ret-cont(1,false) => ok: val=="n1"
+// TEST: if-ret-cont(2, false) => err: val=="nx"
+
+
+
+public function if-cont-no(n int) {
+    // if: then continues, no else
+    if (n==0) {
+        if (1+1==2) {
+            10 ** 3;
+        }
+        return ok(10);
+    }
+    if (n==1) {
+        if (! false) {
+            "d"+"b"+"c";
+        }
+        return ok(101);
+    }
+    return err(1);
+}
+// TEST: if-cont-no(0) => ok: val==10
+// TEST: if-cont-no(1) => ok: val==101
+// TEST: if-cont-no(2) => err: val==1
+
+
+
+public function if-cont-ret(n uint, ythen bool) {
+    // if: then continues, else returns
+    if (n==0) {
+        if (ythen) {
+            1+3;
+        }
+        else {
+            return ok(uint(9 % 2));
+        }
+        return ok(u8 % u2);
+    }
+    if (n==1) {
+        if (ythen) {
+            "a"+"b"+"c";
+            10 ** 5;
+        }
+        else {
+            "a"+"b"+"c";
+            return ok(u5 ^ u2);
+        }
+        return ok(u6 ^ u2);
+    }
+    return err(uint(0));
+}
+// TEST: if-cont-ret(u0,true) => ok: val==0
+// TEST: if-cont-ret(u0,false) => ok: val==1
+// TEST: if-cont-ret(u1,true) => ok: val==4
+// TEST: if-cont-ret(u1,false) => ok: val==7
+// TEST: if-cont-ret(u2, false) => err: val==0
+
+
+public function if-cont-cont(n uint, ythen bool) {
+    // if: then continues, else continues
+    if (n==0) {
+        const ret = 5;
+        if (ythen) {
+            10 ** 5;
+        }
+        else {
+            10 ** 8;
+        }
+        return ok(ret);
+    }
+    if (n==1) {
+        if (ythen) {
+            const ret = 3;
+            "a"+"b"+"c";
+            10 ** 5;
+        }
+        else {
+            "a"+"b"+"c";
+            10 ** 8;
+        }
+        return ok(4);
+    }
+    return err(0);
+}
+// TEST: if-cont-cont(u0,true) => ok: val==5
+// TEST: if-cont-cont(u0,false) => ok: val==5
+// TEST: if-cont-cont(u1,true) => ok: val==4
+// TEST: if-cont-cont(u1,false) => ok: val==4
+// TEST: if-cont-cont(u2, false) => err: val==0
+
+
+public function ifelseif(n int) {
+    if (n<5) {
+        if (n<=2) {
+            return ok(n);
+        }
+        else {
+            return ok(n/2);
+        }
+    }
+    else if (n<10) {
+        if (n<=6) {
+            return ok(n*2);
+        }
+        return err(1);
+    }
+    else if (n<20) {
+        return ok(n*3);
+    }
+    else {
+        return ok(n*4);
+    }
+}
+// TEST: ifelseif(2) => ok: val==2
+// TEST: ifelseif(6) => ok: val==12
+// TEST: ifelseif(7) => err: val==1
+// TEST: ifelseif(10) => ok: val==30
+// TEST: ifelseif(20) => ok: val==80
+
+

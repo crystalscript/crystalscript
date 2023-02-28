@@ -1,0 +1,15 @@
+// in clarity you can't override a previous definition
+
+const amt = u1000;
+
+function fn(a uint) {
+    function fn2() {
+        // this function will become global, so not allowed
+        const amt = u2000;
+        return 2/2;
+    }
+    return 1+1;
+}
+
+// EXPECT: AlreadyDeclaredError
+

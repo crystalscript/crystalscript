@@ -1,0 +1,12 @@
+//=== backfill - refer to body func_def in vars
+public function bf() {
+    const x = map(fnx, [1,2,3]);
+    const y = x[0] * 2;
+    
+    function fnx(n int) {
+        const factor = 2;
+        return n * factor;
+    }
+    return err(x);    
+}
+// TEST: bf() => err: val[0].value==2 && val[1].value==4

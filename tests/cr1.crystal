@@ -1,0 +1,56 @@
+
+// // a
+// function a() {
+//   return min(1,2);
+// }
+
+// // b
+// public function xyz(list<list<uint>(5)>(10) mylist, uint count, string(5) s) {
+//   const mv = u1 + count;
+//   function fn(int y) {
+//      const x = u1 + (u5 - u7);
+//      //c = tx-sender == "S154344444FCDE"
+//      const z = min(y, min(x, mylist[0][1]));
+//      //const r = contract-call(x, z);
+//      return z;
+//   }
+//   // define-private ((xyz-fn (int y, uint x, list<list<uint>(5)>(10) mylist)) (...))
+
+//   return fn(5);
+
+//   // (let ((vars { mv: expr, rtn:
+//   //   (let ((vars2 { x:expr, y:expr, z:expr, r:expr }))
+//   //      (get z vars2)  ;; return value
+//   //   )
+//   //   })
+//   //   (let ((vars3 { a:expr }) (get a vars3)))
+//   //   (get rtn vars))
+//   // )
+
+//   //var x = u1+ (5 - tx-sender);
+//   //return min(x, x);
+// }
+
+// // c
+
+// ;; min value
+// ;; returns the minimum of the two values
+public function min(a uint, b uint) {
+    // ; return stmt
+    return
+       ok(a <= b ?
+            a : // ;; return a
+            // ;; return z
+            b // ;; return b
+            ); 
+}
+
+// ;; no more functions...
+// public function array(list<int> input) {
+//     input.forEach((item, idx) => {
+        
+//     });  // (map anon-fn input)
+// }
+
+// TEST: min,u1,u2 => ok({"UInt":2})
+// TEST: min,u2,u1 => ok({"UInt":1})

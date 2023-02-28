@@ -1,0 +1,46 @@
+function slice-string(c string[1], ctx {
+     index:uint,
+     start:uint,
+     end:uint,
+     result:string[65535]
+}) {
+   const index = ctx["index"];
+   const start = ctx["start"];
+   const end = ctx["end"];
+   if (index >= start && index < end) {
+      return {
+         index: index + 1,
+         start: start,
+         end: end,
+         result: concat(ctx["result"], c)
+      };
+   }
+   else if (index >= end) {
+      return ctx;
+   }
+   else {
+      return {
+         index: index + 1,
+         start: start,
+         end: end,
+         result: ctx["result"]
+      };
+   }
+}
+
+public function slice(txt string[65535], start uint, end uint) {
+    const x = end - start; // ;; clarity-cli: "expecting expression of type 'uint', found 'uint'"
+    const shortcut = 
+          start == 0 ? as-max-len(txt, x) :
+          none;
+    
+    if (shortcut != none) {
+        return ok(shortcut);
+    }
+    
+    return ok(fold(slice-string, txt, {
+        index:u0,
+        start:start,
+        end:end,
+        result:"" })["result"]);
+}

@@ -1,0 +1,10 @@
+
+// function may return int or ok(true)
+
+public function test(x uint) {
+    asserts!(x > 5, 0);
+    return ok(true);
+}
+
+
+// EXPECT: TypeMismatchError

@@ -1,0 +1,83 @@
+function optiontest(
+    mylist optional list<int>[5],
+    str string[10],
+) {
+    if (! mylist) {
+        return ok(0);
+    }
+    
+    else {
+        return ok(mylist[1]);
+        1+1;
+    }
+    if (len(mylist) >= 2) {
+        return ok(mylist[1]);
+    }
+    return err(none);
+}
+
+
+public function op1(which optional int) {
+    if (which == none || which == 1) {
+        const r = optiontest([1,2,3,4], "boo");
+        return err(r.okval + 1);
+    }
+    else if (which == 2) {
+        const r = optiontest(none, "zero");
+        return err(r.okval);
+    }
+    return ok(-1);
+}
+// TEST: op1(none) => err: val==3
+// TEST: op1((some 1)) => err: val==3
+// TEST: op1((some 2)) => err: val==0
+
+
+public function op2(val { a:optional uint, b: optional string[4]}) {
+    return ok(val.a == none ? none : val.a);
+}
+// TEST: op2((tuple (a (some u1)) (b (some u"abc")) )) => ok: val.value==1
+// TEST: op2((tuple (a none) (b (some u"abc")) )) => ok: val==null
+
+
+public function op3(sel string[5]) {
+    const s = optional("boo");
+    return ok(s + " boo" + sel);        
+}
+// TEST: op3(u"!") => ok: val == "boo boo!"
+
+public function op4(sel optional string[5]) {
+    const n = none;
+    const b = optional(true);
+    if (sel >= "n") {
+        return ok(n);
+    }
+    else {
+        return ok(optional(b && n == none));
+    }
+}
+// TEST: op4((some u"n")) => ok: val==null
+// TEST: op4((some u"a")) => ok: val.value == true
+
+public function op5(a optional uint, b optional uint) {
+    return ok(a * b * a);
+}
+// TEST: op5((some u10), (some u20)) => ok: val==2000
+
+public function op6(a optional uint, b optional uint) {
+    return ok(b - a - a);
+}
+// TEST: op6((some u10), (some u20)) => ok: val==0
+
+public function op7(a optional int, b optional int) {
+    return ok(-a + -b + b);
+}
+// TEST: op7((some 10), (some 20)) => ok: val==-10
+
+public function op8(a optional string[5]) {
+    return ok(optional(a));
+}
+// double optional is just optional
+// TEST: op8((some u"abc")) => ok: val.value == "abc"
+
+

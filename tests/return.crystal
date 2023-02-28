@@ -1,0 +1,6 @@
+//=== neg test: no return
+function fn1() {
+    1;
+}
+// EXPECT: SyntaxError
+

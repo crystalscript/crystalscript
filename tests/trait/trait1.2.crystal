@@ -1,0 +1,15 @@
+
+import .mycontract from "./mycontract.import" as mycontract;
+
+implement trait mycontract.name-trait;
+
+function name(str string[10]) {
+    if (str > "n") {
+        return ok(str);
+    }
+    else {
+        return err(u0);
+    }
+}
+// EXPECT: TraitFunctionMismatchError
+

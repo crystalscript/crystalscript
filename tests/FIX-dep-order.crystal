@@ -1,0 +1,22 @@
+// the dep order is not including calls made by global vardecl or
+// functions accessing those variables.
+//
+// below fails because process order is (list1, result, x2, mm), but
+// mm must go before result (not ok) and after x2 (ok)
+
+const list1 = [ u1, u2, u3 ];
+
+function x2(i uint , i2 uint) {
+    function x3(i uint, ix2 int) {
+        return uint(i) * uint(ix2);
+    }
+    return x3(i, int(i2));
+}
+
+const mm = fold(x2, list1, u1);
+
+public function result() {
+    return ok(mm);
+}
+
+// TEST: result() => ok: val==6

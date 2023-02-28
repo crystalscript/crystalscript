@@ -1,0 +1,14 @@
+// import the contract that defines the compute trait
+import .mycontract2 from "./mycontract2.import" as mycontract2;
+
+// implement compute trait
+implement trait mycontract2.compute;
+
+public function cv(a int, b int) { // => response<int,>,
+    return ok(a);
+}
+
+public function fv(a int, b int) { //=> response<int,>,
+    return ok(a*2);
+}
+

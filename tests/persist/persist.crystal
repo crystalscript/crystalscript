@@ -1,0 +1,64 @@
+const x = 4;
+
+public readonly function factor() {
+    return ok(u5);
+}
+
+const y = uint(x) + factor().okval;
+const s = "boo";
+
+persist idx2name as
+      { index:int, str:string[2] } =>
+      { name: string[10] };
+
+persist idx2name2 as
+      { index:int, str:optional string[2] } =>
+      { name: string[10] };
+
+persist idx2name3 as
+      { index:int, str:optional string[2] } =>
+      { name: optional string[10] };
+
+persist size as uint with initial-value=u10 * 2;
+
+
+public readonly function getsize() {
+    return ok(size);
+}
+public function setsize(n uint) {
+    const oldsize = size;
+    size = n;
+    idx2name[{str:"ab", index:1}] = { name: "hi!" };
+    return ok(oldsize);
+}
+// TEST: setsize(u5) => ok: val == 20
+// TEST: setsize(u99) => ok: val == 5
+// TEST: getsize()   => ok: val == 99
+
+
+public function setidxname(idx int, str string[2], name string[10]) {
+    return ok(idx2name[{index:idx, str:str}] = { name:name });
+}
+// TEST: setidxname(1, u"aa", u"joey") => ok: val===true
+
+public function insertidxname(idx int, str string[2], name string[5]) {
+    return ok(idx2name[{index:idx, str:str}] ?= { name:name });
+}
+// TEST: insertidxname(1, u"aa", u"joey") => ok: val===false
+// TEST: insertidxname(2, u"jo", u"joey") => ok: val===true
+
+public function deleteidxname(idx int, str string[2]) {
+    return ok( delete idx2name[{ index:idx, str:str }] );
+}
+// TEST: deleteidxname(1, u"xx") => ok: val===false
+// TEST: deleteidxname(1, u"aa") => ok: val===true
+
+// public function appendname(idx int, str string[2], txt string[5]) {
+//     const oldval = idx2name[{ index:idx,str:str }];
+//     const opt_idx = optional(idx);
+//     return ok( idx2name[{ index:opt_idx,str:str }] = {
+//         name:oldval["name"] + txt
+//     });
+// }
+// TEST: insertidxname(2, u"xx", u"alice") => ok: val===true
+// // TEST: appendname(2, u"xx", u"extra") => ok: val===true

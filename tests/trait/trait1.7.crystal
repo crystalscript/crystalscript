@@ -1,0 +1,15 @@
+// defines trait "name-trait"
+import .mycontract from "./mycontract.import" as mycontract;
+
+// implements "name-trait"
+import ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.trait13
+    from "./trait13.import" as trait13-contract;
+
+// should not be allowed: using contract id syntax to identify the trait
+public function callme2(contract trait<.mycontract.name-trait>, str string[5]) {
+    const r = contract.name(str);
+    return r;
+}
+
+// EXPECT: ArgumentError
+

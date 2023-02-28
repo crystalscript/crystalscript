@@ -1,0 +1,9 @@
+
+public function test(x uint) {
+    asserts!(x < 10, err(-1));
+    return ok(true);
+}
+
+// TEST: test(u1) => ok: val===true
+// TEST: test(u10) => err: val==-1
+

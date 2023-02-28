@@ -1,0 +1,104 @@
+
+public function foreachtest1() {
+    const n = 100;
+    const newarray = foreach([1,2,3], (item) => {
+        return item * n;
+    });
+    return ok(newarray);
+}
+// TEST: foreachtest1() => ok: val[0].value==100 && val[1].value==200 && val[2].value==300
+
+
+//-----------------
+
+public function foreachtest2() {
+    const newarray = foreach([1,2,3], (item, idx) => {
+        return uint(item) * idx;
+    });
+    return ok(newarray);
+}
+// TEST: foreachtest2() => ok: val[0].value==0 && val[1].value==2 && val[2].value==6
+
+
+//-----------------
+
+public function foreachtest3() {
+    const n = 100;
+    const newarray = foreach([1,2,3], (item) => {
+        // ;; inner test
+        function factor() {
+            // ;; return factor
+            return 2;
+        }
+        return item * n * factor();
+    });
+    return ok(newarray);
+}
+// TEST: foreachtest3() => ok: val[0].value==200 && val[1].value==400 && val[2].value==600
+
+
+// -----------------
+
+private function foreachtest4-handler(n int) {
+    return n * 2;
+}
+
+public function foreachtest4() {
+    const newarray = foreach([1,2,3], foreachtest4-handler);
+    return ok(newarray);
+}
+// TEST: foreachtest4() => ok: val[0].value==2 && val[1].value==4 && val[2].value==6
+
+
+//-----------------
+
+
+public function foreachtest5() {
+    const newarray5 = foreach([1,2,3], foreachtest5handler);
+    function foreachtest5handler(n int) {
+        return n * 2;
+    }
+    return ok(newarray5);
+}
+// TEST: foreachtest5() => ok: val[0].value==2 && val[1].value==4 && val[2].value==6
+
+
+// -----------------
+
+public function foreachtest6() {
+    const str = "abc";
+    const newarray = foreach(["x","y1"], (item) => {
+        return str + item;
+    });
+    return ok(newarray);
+}
+
+// TEST: foreachtest6() => ok: val[0].value=="abcx" && val[1].value=="abcy1"
+
+public function foreachtest7() {
+    const listx = [];
+    const newarray = foreach(listx, (item) => {
+        return item;
+    });
+    return ok(newarray);
+}
+// TEST: foreachtest7() => ok: val.length == 0
+
+
+public function foreachtest8() {
+    const listx = [
+        { a:1, b:"abde", d: { v:u1000 } },
+        // shorter string causes clarity size error:
+        //   { a:1, b:"abd", d: { v:u1000 } },
+        { a:2, b:"efg", d: { v:u5 } },
+        { a:3, b:"hijk", d: { v:u1 } }
+    ];
+    const newarray = foreach(listx, (item, idx) => {
+        const newv = { d: { v:item.d.v + uint(item.a) * idx } };
+        return merge(item, newv);
+    });
+    return ok([ newarray[0].d.v, newarray[1].d.v ]);
+}
+// TEST: foreachtest8() => ok: val[0].value==1000 && val[1].value==7
+
+        

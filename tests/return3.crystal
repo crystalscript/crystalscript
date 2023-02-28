@@ -1,0 +1,11 @@
+//=== neg test
+//
+// readonly functions can return anything (but they have to return a
+// reponse type if called from outside the contract)
+
+public readonly function fn1() {
+    return 1;
+}
+// TEST: fn1() => runtime-failure: /Expected a ResponseType/.test(val.runtime)
+
+

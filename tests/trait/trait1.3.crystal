@@ -1,0 +1,17 @@
+
+import .mycontract from "./mycontract.import" as mycontract;
+
+implement trait mycontract.name-trait;
+
+public function name(str string[10]) {
+    if (str > "n") {
+        return ok("12345");
+    }
+    else {
+        return err(u0);
+    }
+}
+// TEST: name(u"op") => ok:val=="12345"
+
+
+
