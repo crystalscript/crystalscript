@@ -1,3 +1,5 @@
+[![tests](https://github.com/crystalscript/crystalscript/actions/workflows/commit-tests.yml/badge.svg)](https://github.com/crystalscript/crystalscript/actions)
+
 # Crystal Script - transpiler for Stacks smart contracts
 
 Crystal Script transforms the crystalscript language into Clarity, the smart contract language for deployment on the Stacks blockchain.
