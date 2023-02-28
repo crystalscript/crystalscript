@@ -181,6 +181,11 @@ if (opts.syntax_check) {
 if (opts.run_tests) {
     console.log('');
     console.log('run tests');
+    var probe = opts.clarity_cli_probe();
+    if (probe.code) {
+        console.error(`Problem running '${opts.clarity_cli}': ${probe.msg}`);
+        process.exit(2);
+    }
     var test_opts = {
         clarity_cli: opts.clarity_cli,
         clarity_db: path.join(opts.tmp_dir, 'test_db'),
