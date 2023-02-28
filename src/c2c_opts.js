@@ -52,7 +52,7 @@ function usage(opts, msg) {
     console.log(`Current settings:`);
     var exists = fs.existsSync(opts.config_json_path) ? 'exists' : 'does not exist';
     console.log(`      config: ${opts.config_json_path} (${exists})`);
-    console.log(` clarity_cli: ${opts.clarity_cli} (${opts.clarity_cli_probe()})`);
+    console.log(` clarity_cli: ${opts.clarity_cli} (${opts.clarity_cli_probe().msg})`);
     console.log(`     tmp_dir: ${opts.tmp_dir}`);
     console.log('');
     process.exit(1);
@@ -202,7 +202,7 @@ function get_c2c_opts(config_json_path, ignore_not_exists) {
         if (path.isAbsolute(this.clarity_cli) &&
             !fs.existsSync(this.clarity_cli))
         {
-            return 'does not exist';
+            return { code:'ENOENT', msg:'does not exist' };
         }
         try {
             var cli = new ClarityCli(
@@ -210,10 +210,10 @@ function get_c2c_opts(config_json_path, ignore_not_exists) {
                 path.join(this.tmp_dir, 'probe')
             );
             cli.generate_address();
-            return 'working';
+            return { code:null, msg:'working' };
         } catch (e) {
-            if (e.code == 'ENOENT') return 'not found';
-            return ''+e;
+            if (e.code == 'ENOENT') return { code:e.code, msg:'not found' };
+            return { code:e.code, msg:''+e };
         }
     };
 

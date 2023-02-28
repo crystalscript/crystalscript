@@ -1,0 +1,22 @@
+name: commit-tests
+on: [push, workflow_dispatch]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      CLARITY_CLI: /tmp/clarity-cli
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: download stacks
+        run: |
+          wget -nv https://github.com/stacks-network/stacks-blockchain/releases/download/2.1.0.0.0/linux-x64.zip
+          unzip linux-x64.zip
+        working-directory: /tmp
+      - name: npm install and test
+        run: |
+          npm ci
+          npm test
+        
