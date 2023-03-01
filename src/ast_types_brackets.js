@@ -54,6 +54,10 @@ import {
     lookup_syscall
 } from './ast_syscall.js';
 
+import {
+    lookup_internal_call
+} from './ast_internal_call.js';
+
 
 
 export function _fill_types_brackets(node, node_type, scopes, opts) {
@@ -92,7 +96,8 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
             { type:'map' },
             { type:'optional', itemtype:{ type:'map' } },
         ];
-        
+
+        var is_string = equal_types(node.expr, { type:'string' });
         var is_list = type_is_one_of(node.expr, valid_list_types);
         var is_map = type_is_one_of(node.expr, valid_map_types);
         var is_datamap = equal_types(node.expr, { type:'datamap' });
@@ -101,14 +106,35 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
         var is_trait = equal_types(node.expr, trait_of_any_type);
         var is_trait_def = equal_types(node.expr, { type:'trait_def' });
         
-        if (!is_list && ! is_map && !is_datamap && !is_response && !is_externdecl && !is_trait && !is_trait_def) {
+        if (!is_string && !is_list && ! is_map && !is_datamap && !is_response && !is_externdecl && !is_trait && !is_trait_def) {
             throw new TypeMismatchError(node, `cannot operate on type '${pretty_type(node.expr)}' with '${node.op}'`);
         }
             
         coerce_literal(node.bracket, { type:'uint' });
         unwrap_optional(node.bracket);
+
+        if (is_string && node.op=='.' &&
+            equal_types(node.bracket, { type:'string' }))
+        {
+            // with dot operator, the grammer ensures the bracket can
+            // only be a literal string
+            if (node.bracket.val == 'ascii') {
+                if (node.expr.op != 'lit')
+                    throw new NotSupportedError(expr, `must be a literal string to use ascii()`);
+                optm_reset_node(node, {
+                    op:'id',
+                    id:'_utf8-to-ascii',
+                    type: 'syscall_ref',
+                    bind: [ node.expr ],
+                    syscall: lookup_internal_call('_utf8-to-ascii')
+                });
+            }
+            else {
+                throw new MapKeyNotFoundError(node, `operator '${node.op}'. invalid key '${node.bracket.val}'`);
+            }
+        }
                                                           
-        if (is_list && equal_types(node.bracket, { type:'uint' })) {
+        else if (is_list && equal_types(node.bracket, { type:'uint' })) {
             if (equal_types(node.expr, optional_of_any_type)) {
                 unwrap_optional(node.expr);
             }

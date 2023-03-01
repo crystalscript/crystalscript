@@ -168,6 +168,9 @@ function c2c_typedef(typedef) {
     else if (typedef.type == 'string') {
         return new ClarList(null, 'string-utf8', typedef.size);
     }
+    else if (typedef.type == 'string-ascii') {
+        return new ClarList(null, 'string-ascii', typedef.size);
+    }
     else if (typedef.type == 'response') {
         return new ClarList(
             null,
@@ -213,6 +216,8 @@ function c2c_lit(expr) {
         return new ClarListLit(expr, 'none');
     else if (expr.type == 'string')
         return new ClarListLit(expr, `u"${expr.val}"`);
+    else if (expr.type == 'string-ascii')
+        return new ClarListLit(expr, `"${expr.val}"`);
     else if (expr.type == 'int')
         return new ClarListLit(expr, expr.val);
     else if (expr.type == 'uint')
@@ -373,7 +378,10 @@ function c2c_expr(expr) {
              expr.op == '*' ||
              expr.op == '/')
     {
-        if (expr.op == '+' && equal_types(expr, { type:'string' })) {
+        if (expr.op == '+' &&
+            (equal_types(expr, { type:'string' }) ||
+             equal_types(expr, { type:'string-ascii' })))
+        {
             return new ClarList(
                 expr,
                 'concat',
