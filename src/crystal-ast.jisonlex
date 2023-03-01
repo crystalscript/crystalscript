@@ -53,6 +53,8 @@ stx_address                 [S][A-Z0-9]{39,40}
 "int"                       return 'INT';
 "uint"                      return 'UINT';
 "bool"                      return 'BOOL';
+"string-ascii"              return 'STRING-ASCII';
+"string-utf8"               return 'STRING';
 "string"                    return 'STRING';
 "principal"                 return 'PRINCIPAL';
 "response"                  return 'RESPONSE';

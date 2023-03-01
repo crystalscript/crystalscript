@@ -465,7 +465,7 @@ function whatever() {
 
 ## Types
 
-Crystalscript supports all the same types as Clarity, except that strings are always utf-8. There is currently no access to ascii strings.
+Crystalscript supports all the same types as Clarity. Strings default to utf-8. To get an ascii string, use `"string".ascii()`.
 
 | Type | Description |                     Literal      | Example |
 | ---- | ----------- |                     -------      | ------- |
@@ -473,6 +473,7 @@ Crystalscript supports all the same types as Clarity, except that strings are al
 | uint | Unsigned positive whole number|"u"{digits}       | const n = u5; |
 | bool | Boolean true/false | true or false | const b = true; |
 |string[LEN]|utf-8 string having a maximum length of LEN|text surrounded by double quotes| const str = "string"; |
+|string-ascii[LEN]|ascii string having a maximum length of LEN|text surrounded by double quotes followed by a call to ascii()| const str = "string".ascii(); |
 |buff[LEN]| Array of arbitrary bytes having a maximum length of LEN|starts with `0x` followed by a series of hexadecimal numbers| const b = 0x01FF; |
 |list<TYPE>[LEN]| Array with maximum length LEN having elements all with the same type TYPE. | values between square brackets| const nums = [1,2,3]; const two = nums[1]; |
 | map/{ key:TYPE, ... }| This type is called a tuple in Clarity. It's also referred to as an associative array and dictionary. The key/TYPE pairs are specified inside curly brackets. Keys don't have to have the same TYPE.| { key:value, ... } | const dict = { a:1, b:{ str:"abc" }}; |
@@ -656,13 +657,13 @@ The following words are reserved by crystalscript and can't used used as identif
 | extern | response |
 | false | return |
 | foreach | string |
-| function | stx-liquid-supply |
-| fungible-token | trait |
-| if | true |
-| implement | tx-sender |
-| implements | uint |
-| import | use |
-| int |  |
+| function | string-ascii |
+| fungible-token | stx-liquid-supply |
+| if | trait |
+| implement | true |
+| implements | tx-sender |
+| import | uint |
+| int | use |
 
 
 
@@ -927,7 +928,7 @@ Tests are added to source code in comments that start with "// TEST:". They have
 ```
 
 - *function-to-call* is the name of a public function within the source code
-- *arguments* are a comman separated list of arguments that the function should be called with. Arguments must be in Clarity syntax, so for example, a list argument must be supplied as the Clarity expression `(list 1 2 3)`. Because strings in crystalscript are only utf-8, any string argument must be preceeded by 'u', for example `myfunction(u"string")`. Use Clarity's "some" function to create an optional, eg `myfunction((some 5))`.
+- *arguments* are a comman separated list of arguments that the function should be called with. Arguments must be in Clarity syntax, so for example, a list argument must be supplied as the Clarity expression `(list 1 2 3)`. Because strings in crystalscript are utf-8, any string argument must be preceeded by 'u', for example `myfunction(u"string")`. Use Clarity's "some" function to create an optional, eg `myfunction((some 5))`.
 - *ok|err|runtime-failure* are the expected response type
 - *javscript test script* is a script that returns true or false to indicate whether the function call returned the expected value.
 

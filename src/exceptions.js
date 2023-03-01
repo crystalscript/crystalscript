@@ -187,6 +187,12 @@ export class AmbiguousContractIdentifier extends ParserError{
         this.name = 'AmbiguousContractIdentifier';
     }
 };
+export class InvalidLiteralValueError extends ParserError{
+    constructor(...args) {
+        super(...args);
+        this.name = 'InvalidLiteralValueError';
+    }
+};
     
 
 export class GeneralWarning extends ParserError{

@@ -602,6 +602,7 @@ export function _fill_types(node, node_type, scopes, opts) {
                     { type:'int' },
                     { type:'uint' },
                     { type:'string' },
+                    { type:'string-ascii' },
                     { type:'buff' },
                 ], opts, `operator '${node.op}'`);
                 copy_type({ type:'bool' }, node);
@@ -848,14 +849,23 @@ export function _fill_types(node, node_type, scopes, opts) {
                 coerce_literal(a, b);
                 ensure_equal_types(a, b, opts,
                                    `operator '${node.op}'`);
-                ensure_type_is_one_of(a, [
-                    { type:'int' },
-                    { type:'uint' },
-                    node.op=='+' ? {type:'string'} : {type:'-'}
-                ], opts, `operator '${node.op}'`);
+                if (node.op == '+') 
+                    ensure_type_is_one_of(a, [
+                        { type:'int' },
+                        { type:'uint' },
+                        { type:'string' },
+                        { type:'string-ascii' }
+                    ], opts, `operator '${node.op}'`);
+                else
+                    ensure_type_is_one_of(a, [
+                        { type:'int' },
+                        { type:'uint' },
+                    ], opts, `operator '${node.op}'`);
+                    
                 copy_type(a, node, b);
 
-                if (equal_types(a, { type:'string' })) {
+                if (type_is_one_of(a, [{ type:'string' },
+                                       { type:'string-ascii' }])) {
                     if (node.op=='+' && a.op == 'lit' && b.op == 'lit') {
                         // optimization: combine string literals
                         var newstring = a.val + b.val;
@@ -1061,7 +1071,10 @@ export function _fill_types(node, node_type, scopes, opts) {
                     optm_raise_child(node, 'a');
                 }
                 else {
-                    ensure_type(node.a, { type:'string' }, opts);
+                    ensure_type_is_one_of(node.a, [
+                        { type:'string' },
+                        { type:'string-ascii' }
+                    ], opts);
                     if (node.a.op !== 'lit')
                         throw new SyntaxError(node, `principals given as expressions aren't supported by clarity`);
                     coerce_literal(node.a, { type:'principal' });

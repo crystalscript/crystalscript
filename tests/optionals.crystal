@@ -59,6 +59,25 @@ public function op4(sel optional string[5]) {
 // TEST: op4((some u"n")) => ok: val==null
 // TEST: op4((some u"a")) => ok: val.value == true
 
+public function op3-ascii(sel string-ascii[5]) {
+    const s = optional("boo".ascii());
+    return ok(s + " boo".ascii() + sel);
+}
+// TEST: op3-ascii("!") => ok: val == "boo boo!"
+
+public function op4-ascii(sel optional string-ascii[5]) {
+    const n = none;
+    const b = optional(true);
+    if (sel >= "n".ascii()) {
+        return ok(n);
+    }
+    else {
+        return ok(optional(b && n == none));
+    }
+}
+// TEST: op4-ascii((some "n")) => ok: val==null
+// TEST: op4-ascii((some "a")) => ok: val.value == true
+
 public function op5(a optional uint, b optional uint) {
     return ok(a * b * a);
 }

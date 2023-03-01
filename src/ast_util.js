@@ -60,6 +60,7 @@ export function source_info(node) {
 const sequence_types = {
     'list': true,
     'string': true,
+    'string-ascii': true,
     'buff': true
 };
 
@@ -180,8 +181,14 @@ export function itemtype_of(type) {
         type:'string',
         size:1
     };
+
+    const string_ascii_itemtype = {
+        type:'string-ascii',
+        size:1
+    };
     
     if (type.type == 'string') return string_itemtype;
+    if (type.type == 'string-ascii') return string_ascii_itemtype;
     if (type.type == 'buff') return buff_itemtype;
     return type.itemtype;
 }
@@ -483,7 +490,8 @@ export function coerce_literal(node, to_type) {
             return true;
         }
     }
-    else if (equal_types(node, {type:'string'}) &&
+    else if (( equal_types(node, { type:'string' }) ||
+               equal_types(node, { type: 'string-ascii' }) ) &&
              equal_types(to_type, {type:'principal'})) {
         // ** string to principal
         copy_type(to_type, node);

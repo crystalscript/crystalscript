@@ -128,6 +128,8 @@ asset_id_type
       {{ $$ = { type:'buff', line:getLine(this._$), size:$3.val }; }}
     | STRING LBRACKET int_literal RBRACKET
       {{ $$ = { type:'string', line:getLine(this._$), size:$3.val }; if ($3.val < 0) parserError(yy, {line:yylineno, expected:'positive integer for index'}); }}
+    | STRING-ASCII LBRACKET int_literal RBRACKET
+      {{ $$ = { type:'string-ascii', line:getLine(this._$), size:$3.val }; if ($3.val < 0) parserError(yy, {line:yylineno, expected:'positive integer for index'}); }}
     ;
 
 txt_with
@@ -324,7 +326,7 @@ expr
       {{ $$ = { op:'foreach', type:null, itemtype:null, a:$3, b:$5, line:getLine(this._$) }; $5.genesis_op = 'foreach'; }}
     | FOREACH LPAREN expr COMMA ID RPAREN
       {{ $$ = { op:'foreach', type:null, itemtype:null, a:$3, b:{op:'id',id:$5,type:null}, line:getLine(this._$) }; }}
-    | PRINCIPAL LPAREN string_literal RPAREN
+    | PRINCIPAL LPAREN expr RPAREN
       {{ $$ = { op:'principal', type:null, line:getLine(this._$), a:$3 }; }}
     | OPTIONAL LPAREN expr RPAREN
       {{ $$ = { op:'optional', type:null, itemtype:null, line:getLine(this._$), a:$3 }; }}
@@ -436,6 +438,8 @@ actual_type
       {{ $$ = { type:'bool', line:getLine(this._$) }; }}
     | STRING LBRACKET int_literal RBRACKET
       {{ $$ = { type:'string', line:getLine(this._$), size:$3.val }; if ($3.val < 0) throw new Error('index cannot be negative'); }}
+    | STRING-ASCII LBRACKET int_literal RBRACKET
+      {{ $$ = { type:'string-ascii', line:getLine(this._$), size:$3.val }; if ($3.val < 0) throw new Error('index cannot be negative'); }}
     | PRINCIPAL
       {{ $$ = { type:'principal', line:getLine(this._$) }; }}
     | response_type
@@ -451,7 +455,7 @@ trait_type
 trait_itemtype
     : ID
       {{ $$={ op:'id', type:null, line:getLine(this._$), id:$1 }; }}
-    | PRINCIPAL LPAREN string_literal RPAREN
+    | PRINCIPAL LPAREN expr RPAREN
       {{ $$ = { op:'principal', type:null, line:getLine(this._$), a:$3 }; }}
     | trait_itemtype LBRACKET expr RBRACKET
       {{ $$ = { op:'[]', type:null, line:getLine(this._$), expr:$1, bracket:$3 }; }}

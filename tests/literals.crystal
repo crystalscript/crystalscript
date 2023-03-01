@@ -8,6 +8,8 @@ public function fn() {
     const n = none;
     const s = "hello";
     const s2 = "peanut"+"butter";
+    const s3 = "old-thinking".ascii();
+    const s4 = "old".ascii() + "thinking".ascii();
 
     const buf = 0xA1B2D3F4153657;
     const list2 = [ ["a"], ["b","c"] ];
@@ -18,7 +20,10 @@ public function fn() {
 
     const rel_contract_addr = .some-fn;
     const abs_contract_addr = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.some-fun;
+    const abs_contract_addr2 = principal("ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.some-fun");
     const stx_addr = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P;
+    const stx_addr2 = principal("ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P");
+    const stx_addr3 = principal("ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P".ascii());
 
     return ok(true);
 }
