@@ -128,6 +128,7 @@ runtest persist/ft.crystal
 runtest persist/nft.crystal
 runtest persist/nft_sip009.crystal
 runtest persist/ft_sip010.crystal
+runtest persist/sft_sip013.crystal
 
 runtest brackets.crystal
 runtest if-permutations.crystal
