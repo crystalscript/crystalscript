@@ -64,6 +64,9 @@ if [ $? -ne 0 ]; then
     rm -f "$dest_path.info";
 else
     jq -r .source "$dest_path.info" > "$dest_path"
+    mv "$dest_path.info" "$dest_path.info_x";
+    jq -c "del(.source)" "$dest_path.info_x" >"$dest_path.info"
+    rm -f "$dest_path.info_x"
     echo "SUCCESS : $dest_path"
 fi
 exit $code
