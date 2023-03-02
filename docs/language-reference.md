@@ -12,6 +12,7 @@ Contents:
     - [Functions](#functions)
     - [Imports](#imports)
       - [Calling functions of other contracts](#calling-functions-of-other-contracts)
+      - [Well known contracts](#well-known-contracts)
     - [Traits](#traits)
       - [Define a trait](#define-a-trait)
       - [Implement a trait](#implement-a-trait)
@@ -269,7 +270,7 @@ More on inner functions can be found [here](#inner-function-definitions)
 
 ## Imports
 
-If the `crystalscript` compiler is given the `--contract-name` argument (or the shortened form `-n`), it will create a `contract-name.import` file next to the `.clar` compiled output file.
+If the crystalscript compiler is given the `--contract-name` argument (or the shortened form `-n`), it will create a `contract-name.import` file next to the `.clar` compiled output file.
 
 For example, running the command:
 ```
@@ -375,6 +376,40 @@ test 1: (get-registration-cost u"noth")
 
 1 tests, 0 failures, 1 successes
 ```
+
+
+### Well known contracts
+
+There are a few well known contracts that are included with crystalscript that can be imported into any script.
+
+| Contract  | Description |
+| --------  | ----------- |
+| nft-trait | Trait defined by SIP-009 for non-fungible tokens  |
+| sip-010-trait-ft-standard | Trait defined by SIP-010 for fungible tokens |
+
+These contracts can be imported with the following syntax:
+```
+import "CONTRACT" as NAME;
+```
+
+for example:
+```
+// import SIP-009 nft-trait contract
+import "nft-trait" as nft-trait;
+
+// implement nft-trait from the contract
+implement trait nft-trait.nft-trait;
+
+public function get-last-token-id() {
+    return ok(u1);
+}
+//...
+```
+
+For more information see [https://github.com/stacksgov/sips](https://github.com/stacksgov/sips).
+
+These contracts all have different contract id's depending on what stacks network you'd deploying to (eg. testnet or mainnet). When compiling, use the `--net` argument to choose what network to compile for.
+
 
 
 ## Traits

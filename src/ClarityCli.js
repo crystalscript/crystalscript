@@ -45,7 +45,7 @@ export default class ClarityCli {
         return json.address;
     }
 
-    newdb() {
+    newdb(contract_library, override_stx_addr) {
         fs.rmSync(this.vmdb, { recursive:true, force:true });
         fs.mkdirSync(path.dirname(this.vmdb), { recursive: true });
         var result =
@@ -61,10 +61,42 @@ export default class ClarityCli {
         if (result.status != 0) {
             throw new Error(`unable to create db: ${result.stdout}`);
         }
+        if (contract_library)
+            this.load_all(contract_library, override_stx_addr);
     }
 
-    deploy_contract(dotted_name, path_to_clar_file) {
-        console.log(`deploy ${path_to_clar_file} as ${dotted_name}`);
+    load_all(dir, override_stx_addr) {
+        console.log(`load all contracts from ${dir}`);
+        var entries = fs.readdirSync(dir);
+        entries.forEach(file => {
+            if (!/\.clar$/.test(file)) return;
+            // the file is exptected to be named stx_addr.name.clar
+            var parts = file.split('.');
+            var contract_name = null;
+            if (parts.length == 3) {
+                if (override_stx_addr) {
+                    // if given, don't use the stx_addr from the file name
+                    contract_name = `${override_stx_addr}.${parts[1]}`;
+                }
+                else {
+                    contract_name = `${parts[0]}.${parts[1]}`;
+                }
+            }
+            else if (parts.length == 2) {
+                contract_name = '.' + parts[0];
+            }
+            else {
+                contract_name = file.substr(0, file.length - 5);
+            }
+            this.deploy_contract(contract_name, path.join(dir, file), {
+                quiet: true });
+        });
+    }
+
+    deploy_contract(dotted_name, path_to_clar_file, opts) {
+        // dotted_name must be "stx_addr.contract"
+        if (! opts || !opts.quiet)
+            console.log(`deploy ${path_to_clar_file} as ${dotted_name}`);
         var result =
             child_process.spawnSync(
                 this.cli, [

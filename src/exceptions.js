@@ -59,7 +59,10 @@ export class ParserError extends Error {
     }
 
     set_file(path) {
-        this.message += ` of file ${path}`;
+        if (this.node)
+            this.message += ` of file ${path}`;
+        else
+            this.message += ` in ${path}`;
     }
 
     get_message() {

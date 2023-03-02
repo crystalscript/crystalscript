@@ -1,0 +1,31 @@
+//
+// SIP-009 "nft-trait" contract
+//
+// Contract: .nft-trait
+
+// Example import statement:
+//   import "nft-trait" as nft-trait;
+//
+// Once imported, use or implement the trait. Eg:
+//   implement trait nft-trait.nft-trait;
+//
+
+declare extern {
+    trait nft-trait {
+          // Last token ID, limited to uint range
+          public function get-last-token-id()
+                 => response<uint,uint>,
+
+          // URI for metadata associated with the token
+          public function get-token-uri(uint)
+                 => response<optional string-ascii[256], uint>,
+
+          // Owner of a given token identifier
+          public function get-owner(uint)
+                 => response<optional principal, uint>,
+
+          // Transfer from the sender to a new principal
+          public function transfer(uint, principal, principal)
+                 => response<bool, uint>
+    }
+};

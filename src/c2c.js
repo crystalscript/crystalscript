@@ -69,7 +69,10 @@ import {
 } from './c2c_opts.js';
 
 import ClarityCli from './ClarityCli.js';
-import run_tests from './clar_test_runner.js';
+
+import {
+    run_tests,
+} from './clar_test_runner.js';
 
 
 
@@ -163,9 +166,9 @@ if (opts.syntax_check) {
     try {
         var cli = new ClarityCli(
             opts.clarity_cli,
-            path.join(opts.tmp_dir, 'syntax_check_db')
+            path.join(opts.tmp_dir, 'syntax_check_db'),
         );
-        cli.newdb();
+        cli.newdb(opts.testing.contract_library);
         var json = cli.syntax_check(opts.clar_file);
         console.log(`SUCCESS: ${safeStringify(json)}`);
     } catch(e) {
@@ -192,6 +195,7 @@ if (opts.run_tests) {
         tmp_dir: opts.tmp_dir,
         clar_file: opts.clar_file,
         newdb: opts.testing.newdb,
+        contract_library: opts.testing.contract_library,
         sender_addr: opts.testing.sender_addr,
         contract_name: opts.contract_name,
         debug: opts.debug
@@ -243,6 +247,8 @@ function compile(opts, input) {
                              `;; contract: ${opts.contract_name}\n`);
         fs.writeFileSync(opts.clar_fd,
                          `;; generated from ${path.basename(opts.src)}\n`);
+        fs.writeFileSync(opts.clar_fd,
+                         `;; compiled for '${opts.network}' stacks network\n`);
         fs.writeFileSync(opts.clar_fd, `\n`);
     }
     
