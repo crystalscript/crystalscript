@@ -1,0 +1,48 @@
+import "sip013-semi-fungible-token-trait" as sft-trait;
+import "sip013-transfer-many-trait" as sft-many-trait;
+
+implement trait sft-trait.sip013-semi-fungible-token-trait;
+implement trait sft-many-trait.sip013-transfer-many-trait;
+
+public function get-balance(tokid uint, who principal) {
+    return ok(u1000);
+}
+
+public function get-overall-balance(who principal) {
+    return ok(u0);
+}
+
+public function get-total-supply(tokenid uint) {
+    return ok(u100000);
+}
+
+public function get-overall-supply() {
+    return ok(u1000000);
+}
+
+public function get-decimals(tokenid uint) {
+    return ok(u6);
+}
+
+public function get-token-uri(tokenid uint) {
+    return ok(optional("http://url/".ascii()));
+}
+
+public function transfer(tokid uint, amt uint, sender principal, recipient principal) {
+    return ok(true);
+}
+
+public function transfer-memo(tokid uint, amt uint, sender principal, recipient principal, memo buff[34]) {
+    return ok(true);
+}
+
+
+public function transfer-many(transfers list<{token-id: uint, amount: uint, sender: principal, recipient: principal}>[200]) {
+    return ok(true);
+}
+        
+public function transfer-many-memo(transfers list<{token-id: uint, amount: uint, sender: principal, recipient: principal, memo: buff[34]}>[200]) {
+    return ok(true);
+}
+
+

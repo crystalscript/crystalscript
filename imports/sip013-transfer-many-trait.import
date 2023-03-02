@@ -1,0 +1,22 @@
+//
+// SIP-013 "semi-fungible token trait" contract - send-many trait
+//
+// Contract: .sip013-transfer-many-trait
+
+// Example import statement:
+//   import "sip013-transfer-many-trait" as sft-many-trait;
+//
+// Once imported, use or implement the trait. Eg:
+//   implement trait sft-many-trait.sip013-transfer-many-trait;
+//
+
+declare extern {
+    trait sip013-transfer-many-trait {
+        // Transfer many tokens at once.
+        public function transfer-many(list<{token-id: uint, amount: uint, sender: principal, recipient: principal}>[200]) => response<bool, uint>,
+        
+		// Transfer many tokens at once with memos.
+        public function transfer-many-memo(list<{token-id: uint, amount: uint, sender: principal, recipient: principal, memo: buff[34]}>[200]) => response<bool, uint>
+    }
+};
+

@@ -1,0 +1,7 @@
+{
+    "contract_id": {
+        "mainnet": "SPDBEG5X8XD50SPM1JJH0E5CTXGDV5NJTKAKKR5V.sip013-semi-fungible-token-trait",
+        "testnet": "STDBEG5X8XD50SPM1JJH0E5CTXGDV5NJTJTTH7YB.sip013-semi-fungible-token-trait",
+        "dev": "SPDBEG5X8XD50SPM1JJH0E5CTXGDV5NJTKAKKR5V.sip013-semi-fungible-token-trait"
+    }
+}

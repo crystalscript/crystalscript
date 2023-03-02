@@ -382,10 +382,13 @@ test 1: (get-registration-cost u"noth")
 
 There are a few well known contracts that are included with crystalscript that can be imported into any script.
 
-| Contract  | Description |
-| --------  | ----------- |
-| nft-trait | Trait defined by SIP-009 for non-fungible tokens  |
-| sip-010-trait-ft-standard | Trait defined by SIP-010 for fungible tokens |
+| Contract                          | Description |
+| --------------------------------- | ----------- |
+| nft-trait                         | Trait defined by SIP-009 for non-fungible tokens  |
+| sip-010-trait-ft-standard         | Trait defined by SIP-010 for fungible tokens |
+| sip013-semi-fungible-token-trait  | Trait defined by SIP-013 for semi-fungible tokens |
+| sip013-transfer-many-trait        | Trait defined by SIP-013 for send many transfers |
+
 
 These contracts can be imported with the following syntax:
 ```
