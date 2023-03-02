@@ -39,6 +39,7 @@ function usage(opts, msg) {
     console.log(`   -o <file.clar>  output Clarity to file.clar (defaults to source.crystal.clar`);
     console.log(`   -s check syntax with clarity-cli`);
     console.log(`   -n|--contract-name <name>  specify a name for the deployed contract`);
+    console.log(`   --net <network>  compile for a specific stacks network, eg "mainnet", "testnet", etc. Defaults to "dev"`);
     console.log(`   -v|--version show the version and exit`);
     console.log();
     console.log(`testing:`);
@@ -121,6 +122,10 @@ export function process_cmdline() {
             if (/^\./.test(opts.contract_name))
                 opts.contract_name = opts.contract_name.substr(1);
         }
+        else if (arg() == "--net") {
+            next();
+            opts.network = arg(`network name not given`); next();
+        }
         else if (arg() == "-v" || arg() == "--version") {
             console.log(`crystalscript ${VERSION} ${CLARITY_VERSION}`);
             process.exit(0);
@@ -169,18 +174,19 @@ function get_c2c_opts(config_json_path, ignore_not_exists) {
     var opts = {
         clarity_cli: process.env['CLARITY_CLI'] || 'clarity-cli',
         tmp_dir,
-        contract_name: null,
+        network: 'dev',   // 'mainnet', 'testnet', etc
         testing: {
             newdb: true,
             sender_addr: null,
+            contract_library: path.resolve( path.join(_scriptdir, '../contracts/mainnet') ),
         },
         warning: function(...args) {
             var e = new GeneralWarning(...args);
-            if (args.length == 1 && (args[0] instanceof ParserError)) {
-                e = new GeneralWarning(args[0].node, args[0].get_message());
-            }
-            else if (args.length == 1 && (args[0] instanceof GeneralWarning)) {
+            if (args.length == 1 && (args[0] instanceof GeneralWarning)) {
                 e = args[0];
+            }
+            else if (args.length == 1 && (args[0] instanceof ParserError)) {
+                e = new GeneralWarning(args[0].node, args[0].get_message());
             }
             console.error(''+e);
         }
@@ -188,6 +194,7 @@ function get_c2c_opts(config_json_path, ignore_not_exists) {
     };
     Object.assign(opts, config_json, {
         compile: true,
+        contract_name: null,
         syntax_check: false,
         run_tests: false,
         src: null,

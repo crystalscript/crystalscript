@@ -1,0 +1,43 @@
+//
+// SIP-010 "sip-010-trait-ft-standard" contract
+//
+// Contract: .sip-010-trait-ft-standard
+
+// Example import statement:
+//   import "sip-010-trait-ft-standard" as ft-trait-standard;
+//
+// Once imported, use or implement the trait. Eg:
+//   implement trait ft-trait-standard.sip-010-trait;
+//
+
+declare extern {
+    trait sip-010-trait {
+          // Transfer from the caller to a new principal
+          public function transfer(uint, principal, principal, optional buff[34])
+                => response<bool, uint>,
+
+          // the human readable name of the token
+          public function get-name()
+                => response<string-ascii[32], uint>,
+
+          // the ticker symbol, or empty if none
+          public function get-symbol()
+                => response<string-ascii[32], uint>,
+
+          // the number of decimals used, eg. 6 would mean 1000000 represents 1 token
+          public function get-decimals()
+                => response<uint, uint>,
+
+          // the balance of the passed principal
+          public function get-balance(principal)
+                => response<uint, uint>,
+
+          // the current total supply
+          public function get-total-supply()
+                => response<uint, uint>,
+
+          // an optional URI that represents metadata of this token
+          public function get-token-uri()
+                => response<optional string[256], uint>
+    }
+};

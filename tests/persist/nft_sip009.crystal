@@ -1,0 +1,23 @@
+// import SIP-009 nft-trait contract
+import "nft-trait" as nft-trait;
+
+// implement nft-trait from the contract
+implement trait nft-trait.nft-trait;
+
+public function get-last-token-id() {
+    return ok(u1);
+}
+
+public function get-token-uri(id uint) {
+    return ok(optional("http://path/".ascii()));
+}
+
+public function get-owner(id uint) {
+    return err(u1);
+}
+
+public function transfer(id uint, from principal, to principal) {
+    return ok(true);
+}
+
+

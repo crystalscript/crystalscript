@@ -15,6 +15,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
     ParserError,
@@ -32,6 +33,8 @@ import {
 
 import compiler from './crystal-ast.cjs';
 
+const _scriptdir = path.dirname(fileURLToPath(import.meta.url));
+const _imports_dir = path.resolve(path.join(_scriptdir, '..', 'imports'));
 
 export function func_signature_as_text(func_def) {
     var vis = func_def.vis;
@@ -107,14 +110,44 @@ export function generate_import_file(ast, contract_name, output_cb) {
 
 
 export function compile_import_file(opts, fn, contract_id, as_id) {
-    var txt = fs.readFileSync(fn).toString();
+    try {
+        var txt = fs.readFileSync(fn).toString();
+    } catch(e) {
+        throw new ImportFileError(opts.ctx_node, `${e}`);
+    }
+
+    // if the contract_id was not given with the import statement, try
+    // to get it from the import file's .json file
+    var import_json_fn = fn + '.json';
+    var contract_id_from_json = false;
+    if (!contract_id && fs.existsSync(import_json_fn)) {
+        try {
+            var json =JSON.parse(fs.readFileSync(import_json_fn).toString());
+            if (json.contract_id) {
+                var val = json.contract_id[opts.compile.network] ||
+                    json.contract_id["default"];
+                if (val) {
+                    contract_id = { op:'lit', type:'string', val };
+                    contract_id_from_json = true;
+                }
+                else {
+                    var e = new GeneralWarning(`a contract id for stacks network '${opts.compile.network}' was not found and there was no default`);
+                    e.set_file(import_json_fn);
+                    opts.compile.warning(e);
+                }
+            }
+        } catch(e) {
+            throw new ImportFileError(opts.ctx_node, `could not read '${import_json_fn}': ${e}`);
+        }
+    }
+
 
     // give a warning if the contact name in the import file
     // differs from the one specified by the import statement
     
     var re = /\n\/\/ Contract: (.*)/;
     var match = txt.match(re);
-    if (match) {
+    if (match && contract_id && !contract_id_from_json) {
         var contract_parts = contract_id.val.split('.');
         var name = contract_parts[contract_parts.length -1];
         var cmp_name = match[1];
@@ -128,8 +161,8 @@ export function compile_import_file(opts, fn, contract_id, as_id) {
     var ast = new compiler.Parser().parse(txt);
     ast.forEach(def => {
         if (def.op == 'declare_extern') {
-            if (def.id || def.contract_id) {
-                var e = new GeneralWarning(def, `overriding the import file's contract id and alias with the import statement's`);
+            if (contract_id && def.contract_id) {
+                var e = new GeneralWarning(def, `overriding the import file's contract id with the import statement's`);
                 e.set_file(fn);
                 opts.compile.warning(e);
             }
@@ -149,9 +182,26 @@ export function merge_imports(ast, compile) {
     ast.forEach((definition, idx) => {
         if (definition.op == 'import') {
             var rel_base = path.dirname(compile.src);
-            var import_path = path.isAbsolute(definition.file) ?
-                definition.file : path.join(rel_base, definition.file);
+            var is_absolute = path.isAbsolute(definition.file);
+            var is_relative = !is_absolute && definition.file.substr(0,1)=='.';
+            var import_path = null;
+            if (is_absolute || is_relative) {
+                import_path = is_absolute ?
+                    definition.file : path.join(rel_base, definition.file);
+            }
+            else {
+                import_path =path.resolve(
+                    path.join(_imports_dir, definition.file +'.import')
+                );
+                if (import_path.substr(0, _imports_dir.length) != _imports_dir)
+                {
+                    // make sure the final path is within the
+                    // 'imports' directory
+                    throw new ImportFileError(opts.ctx_node, `not a valid import location '${definition.file}'`);
+                }
+            }
             
+
             try {
                 var import_ast = compile_import_file(
                     { ctx_node: definition,

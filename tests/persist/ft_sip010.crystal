@@ -1,0 +1,32 @@
+import "sip-010-trait-ft-standard" as ft-trait-standard;
+
+implement trait ft-trait-standard.sip-010-trait;
+
+public function transfer(amt uint, from principal, to principal, z optional buff[34]) {
+    return ok(true);
+}
+
+
+public function get-name() {
+    return ok("gold".ascii());
+}
+
+public function get-symbol() {
+    return ok("gold".ascii());
+}
+
+public function get-decimals() {
+    return ok(u6);
+}
+
+public function get-balance(p principal) {
+    return ok(u100000000);
+}
+
+public function get-total-supply() {
+    return ok(u1000000000);
+}
+ 
+public function get-token-uri() {
+    return ok(optional("http://gold/"));
+}

@@ -18,11 +18,18 @@ import ClarityCli from './ClarityCli.js';
 import { safeStringify } from './ast_util.js';
 import TestDefinition from './TestDefinition.js';
 
+export const available_senders = [
+    'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P',
+    "ST2ZRX0K27GW0SP3GJCEMHD95TQGJMKB7G9Y0X1MH",
+    "SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303"
+];
 
-export default function run_tests(opts, input) {
+
+export function run_tests(opts, input) {
     // opts:
     //    clarity_cli: path to clarity-cli
     //    newdb: if true, create a new vmdb
+    //    contract_library: load all contracts from this directory when newdb
     //    tmp_dir: path of temporary directory to use
     //    clar_file: path to .clar contract file
     //    sender_addr: stacks address of contract publisher (optional)
@@ -37,17 +44,7 @@ export default function run_tests(opts, input) {
     // }
     
     var cli = new ClarityCli(opts.clarity_cli, opts.clarity_db);
-    if (opts.newdb) {
-        console.log(`creating new clarity vm db '${path.basename(opts.clarity_db)}'`);
-        cli.newdb();
-    }
 
-    const available_senders = [
-        'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P',
-        "ST2ZRX0K27GW0SP3GJCEMHD95TQGJMKB7G9Y0X1MH",
-        "SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303"
-    ];
-    
     var sender_addr = available_senders[0];
     if (opts.sender_addr) {
         if (Number.isNaN(opts.sender_addr)) {
@@ -60,7 +57,13 @@ export default function run_tests(opts, input) {
             sender_addr = available_senders[idx];
         }
     }
-    
+
+    if (opts.newdb) {
+        console.log(`creating new clarity vm db '${path.basename(opts.clarity_db)}'`);
+        cli.newdb(opts.contract_library);
+    }
+
+
     var contract_name = `${sender_addr}.${opts.contract_name || 'test'}`;
 
     // deploy the contract

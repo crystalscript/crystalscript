@@ -209,6 +209,8 @@ public_visibility
 import_file
     : IMPORT contract_id txt_from string_literal AS ID SEMICOLON
       {{ $$={ op:'import', file:$4.val, contract_id:$2, as_id:$6, line:getLine(this._$) }; }}
+    | IMPORT string_literal AS ID SEMICOLON
+      {{ $$={ op:'import', file:$2.val, contract_id:null, as_id:$4, line:getLine(this._$) }; }}
     ;
 
 
