@@ -10,7 +10,7 @@ import {
 
 import ClarityCli from './ClarityCli.js';
 
-const VERSION = "0.3.0";
+const VERSION = "0.3.1";
 const CLARITY_VERSION = "Clarity2";
 
 const _scriptdir = path.dirname(fileURLToPath(import.meta.url));
