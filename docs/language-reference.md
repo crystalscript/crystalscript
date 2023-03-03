@@ -11,6 +11,8 @@ Contents:
       - [Non-fungible tokens](#non-fungible-tokens)
     - [Functions](#functions)
     - [Imports](#imports)
+      - [Import statement](#import-statement)
+      - [Import for a specific Stacks network](#import-for-a-specific-stacks-network)
       - [Calling functions of other contracts](#calling-functions-of-other-contracts)
       - [Well known contracts](#well-known-contracts)
     - [Traits](#traits)
@@ -20,6 +22,7 @@ Contents:
       - [Execute a function that requires a trait as an argument](#execute-a-function-that-requires-a-trait-as-an-argument)
 
 1. [Types](#types)
+    - [Type properties](#type-properties)
     - [Special literals](#special-literals)
     - [Type conversion functions](#type-conversion-functions)
     - [Working with responses](#working-with-responses)
@@ -185,13 +188,27 @@ for fungible tokens with unlimited supply, use:
 persist NAME as fungible-token with unlimited-supply;
 ```
 
-For example an 'updown' token with 1 million maximum supply:
+For example, an 'updown' token with 1 million maximum supply:
 ```
 persist updown as fungible-token with total-supply=u1000000;
 ```
 
-To mint, burn, transfer, etc these tokens, see the [system calls](#system-calls) that start with "ft-".
+To mint, burn, transfer, etc these tokens, see the [system calls](#system-calls) that start with "ft-", or use the corresponding properties of the fungible token:
 
+```
+persist updown as fungible-token with total-supply=u1000000;
+
+const alice = SP2JPBTPVXN7V5N0SH7ZP95GM1GTFVT8SKVAW3R77;
+const bob = SP3WT3PT3NA5SWW82DZ8ZFK8RN412AD3KR5Q7Q3K4;
+
+public function mint-and-give() {
+    updown.mint?(u100, alice);
+    updown.getSupply();
+    updown.transfer?(u15, alice, bob);
+    updown.burn?(u10, alice);
+    return ok( updown.getBalance(alice) );  // 75
+}
+```
 
 
 ### Non-fungible tokens
@@ -212,8 +229,21 @@ persist nifty as nonfungible-token identified by string[50];
 
 The indentifier, or unique id, for non-fungible tokens may use 'int', 'uint', 'buff' and 'string' types.
 
-To mint, burn, transfer, etc these tokens, see the [system calls](#system-calls) that start with "nft-".
+To mint, burn, transfer, etc these tokens, see the [system calls](#system-calls) that start with "nft-", or use the corresponding properties of the non-fungible token:
+```
+persist nifty as nonfungible-token identified by string[50];
 
+const alice = SP2JPBTPVXN7V5N0SH7ZP95GM1GTFVT8SKVAW3R77;
+const bob = SP3WT3PT3NA5SWW82DZ8ZFK8RN412AD3KR5Q7Q3K4;
+
+public function mint-and-give() {
+    nifty.mint?("roo", alice);
+    nifty.mint?("hardy", alice);
+    nifty.transfer?("roo", alice, bob);
+    nifty.burn?("hardy", alice);
+    return ok( nifty.getOwner?("roo") );  // bob
+}
+```
 
 ## Functions
 
@@ -285,6 +315,48 @@ will produce the two files:
 
 The import file contains declarations that allow other contracts to access it's public functions, read-only functions, trait definitions and trait implementations.
 
+### Import statement
+
+`import` has the following two syntaxes:
+
+1. `import CONTRACT-ID from "/path/to/file.import" as ID;`
+1. `import "/path/to/file.import" as ID;`
+
+The first import statement requires a CONTRACT-ID and ID.
+
+CONTRACT-ID is an abolute or relative contract principal. eg. "ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.contract-name" or ".contract-name", respectively. And, ID is an identifier used to refer to the contract in the program.
+
+The definitions of the imported file will be assocated with the contract-id specified. At deployment time, the contract must exist and contain those definitions or Stacks will reject the contract.
+
+If the import file path is a relative path:
+
+- ... and the path starts with "./". The file will be read relative to the script that contains the import statement. For example: "./ftcontract.import".
+- ... otherwise, the import is loaded from the directory containing the well-known set of imports see [well known contracts](#well-known-contracts).
+
+### Import for a specific Stacks network
+
+The second import statement syntax lacks a CONTRACT-ID. This syntax requires that an additional file ("file.import.json") exists in the same directory as the import file, which contains a lookup table with the contract id for the *stacks network being compile for*.
+
+The default stacks network is "dev", but can be changed to something else like "testnet" or "mainnet" with crystalscript argument `--net <network>`.
+
+For example, SIP-009 defines trait "nft-trait". This trait exists on mainnet as "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait" and testnet as "ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.nft-trait".
+
+To avoid having to maintain multiple source code files, eg. one for testnet and one for mainnet, simply create an import.json file for it:
+
+```
+{
+    "contract-id": {
+        "mainnet": "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait",
+        "testnet": "ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.nft-trait",
+        "dev": "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait"
+    }
+}
+```
+
+The compiler will first look for the network name in the "contract-id" map choosing the contract id from that key if it exists. If it doesn't exist, the compiler  will look for a key named "default" and use the contract-id associated with it. Otherwise, compilation will fail.
+
+
+
 ### Calling functions of other contracts
 
 Let's say we have two contracts (files) "price.crystal" and "register.crystal". The "price.crystal" functions `get-itemid()` and `priceof()` are accessed by "register.crystal" by importing the `price.import` file using the syntax `import .price from "./price.import" as price`, then calling the functions using `price.get-itemid()` and `price.priceof()`.
@@ -296,6 +368,8 @@ Here is a concrete example:
 // price.crystal
 // --------------------------------------------------------
 // compile with: "crystalscript -n price -t price.crystal"
+// saved: price.crystal.clar
+// saved: price.import
 
 const noth_itemid = u2001;
 
@@ -323,6 +397,7 @@ public function priceof(itemid uint) {
 // register.crystal
 // --------------------------------------------------------
 // compile with: "crystalscript -t --no-newdb register.crystal"
+// saved: register.crystal.clar
 
 import .price from "./price.import" as price;
 
@@ -403,6 +478,7 @@ import "nft-trait" as nft-trait;
 // implement nft-trait from the contract
 implement trait nft-trait.nft-trait;
 
+// required function of nft-trait
 public function get-last-token-id() {
     return ok(u1);
 }
@@ -503,22 +579,107 @@ function whatever() {
 
 ## Types
 
-Crystalscript supports all the same types as Clarity. Strings default to utf-8. To get an ascii string, use `"string".ascii()`.
+Crystalscript supports all the same types as Clarity. Strings default to utf-8. To get an ascii string, use `"string".ascii()`, which tells the compiler to emit an ascii literal (it won't cause an additional function call).
+
+#### Basic types
 
 | Type | Description |                     Literal      | Example |
 | ---- | ----------- |                     -------      | ------- |
 | int  | Signed whole number |   [-]{digits}             | const n = -10; |
 | uint | Unsigned positive whole number|"u"{digits}       | const n = u5; |
 | bool | Boolean true/false | true or false | const b = true; |
+| principal | relative or absolute contract id | .contract or stacks-address.contract | const p = .mycontract; const p2 = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.mycontract; |
+
+#### Sequence types
+
+| Type | Description |                     Literal      | Example |
+| ---- | ----------- |                     -------      | ------- |
 |string[LEN]|utf-8 string having a maximum length of LEN|text surrounded by double quotes| const str = "string"; |
 |string-ascii[LEN]|ascii string having a maximum length of LEN|text surrounded by double quotes followed by a call to ascii()| const str = "string".ascii(); |
 |buff[LEN]| Array of arbitrary bytes having a maximum length of LEN|starts with `0x` followed by a series of hexadecimal numbers| const b = 0x01FF; |
 |list<TYPE>[LEN]| Array with maximum length LEN having elements all with the same type TYPE. | values between square brackets| const nums = [1,2,3]; const two = nums[1]; |
-| map/{ key:TYPE, ... }| This type is called a tuple in Clarity. It's also referred to as an associative array and dictionary. The key/TYPE pairs are specified inside curly brackets. Keys don't have to have the same TYPE.| { key:value, ... } | const dict = { a:1, b:{ str:"abc" }}; |
+
+#### Map
+
+| Type | Description |                     Literal      | Example |
+| ---- | ----------- |                     -------      | ------- |
+| map  | This type is called a tuple in Clarity. It's also referred to as an associative array and dictionary. The key/TYPE pairs are specified inside curly brackets. Values don't have to have the same TYPE.| { key:TYPE, ... } | const dict = { a:1, b:{ str:"abc" }}; |
+
+#### Optional
+
+| Type | Description |                     Literal      | Example |
+| ---- | ----------- |                     -------      | ------- |
 | optional TYPE | a type that may be 'none' or be TYPE | optional(value) | const op = optional(5); |
-| response<OKTYPE,ERRTYPE> | a response wraps a value that is either designated as "ok" or "err" depending on how the response was contructed. An "ok" response has type OKTYPE, and "err ERRTYPE | ok(value) or err(value) | const resp = ok(u10); |
-| trait<TRAIT-DEF> |trait having a trait definition specified by TRAIT-DEF | this is a pure type - there is no way to construct a trait literal | |
-| principal | relative or absolute contract id | .contract or stacks-address.contract | const p = .mycontract; const p2 = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.mycontract; |
+
+#### Response
+
+| Type | Description |                     Literal      | Example |
+| ---- | ----------- |                     -------      | ------- |
+| response<OKTYPE,ERRTYPE> | a response wraps a value that is either designated as "ok" or "err" depending on how the response was contructed. An "ok" response has type OKTYPE, and "err" type ERRTYPE | ok(value) or err(value) | const resp = ok(u10); |
+
+#### Other types
+
+These are advanced types that have no literal construction.
+
+| Type | Description |
+| ---- | ----------- |
+| trait\<TRAIT-DEF> |trait having a trait definition specified by TRAIT-DEF. See the topic on [traits](#traits). |
+| datavar | A persisted variable created with `persist NAME as TYPE` |
+| datamap | A persisted map created with `persist NAME as TYPE => TYPE` |
+| ft   | A fungible token created by `persist fungible token` |
+| nft  | A non-fungible token created by `persist nonfungible-token` |
+
+
+
+
+### Type properties
+
+Some types have properties that may be accessed with the dot operator. Below is a table of types and their supported properties along with the corresponding system call for it, if applicable.
+
+
+| Type                 | Property      | System call     | Example          |
+| -------------------- | ------------- | --------------- | ---------------- |
+| string,              | .concat()     | concat          | "abc".len()      |
+| string-ascii         | .indexOf?()   | index-of?       |                  |
+|                      | .replaceAt?() | replace-at?     |                  |
+|                      | .slice?()     | slice?          |                  |
+|                      | .len()        | len             |                  |
+|                      | .ascii()      |                 |                  |
+|                      | .toInt?()     | string-to-int?  |                  |
+|                      | .toUint?()    | string-to-uint? |                  |
+|                      |               |                 |                  |
+|                      |               |                 |                  |
+| buff                 | .concat()     | concat          | 0x01.concat(0x02) |
+|                      | .indexOf?()   | index-of?       |                  |
+|                      | .replaceAt()  | replace-at?     |                  |
+|                      | .slice?()     | slice?          |                  |
+|                      | .len()        | len             |                  |
+|                      |               |                 |                  |
+| list                 | .concat()     | concat          | [1,2].indexOf?(2) |
+|                      | .indexOf?     | index-of?       |                  |
+|                      | .replaceAt?() | replace-at?     |                  |
+|                      | .slice?()     | slice?          |                  |
+|                      | .len()        | len             |                  |
+|                      | .append()     | append          |                  |
+|                      |               |                 |                  |
+| int, uint            | .toStringAscii() | int-to-ascii | 5.toString()     |
+|                      | .toString()   | int-to-utf8     |                  |
+|                      |               |                 |                  |
+| response             | .isok()       | is-ok           | const v = r.okval |
+|                      | .iserr()      | is-err          |                  |
+|                      | .okval        | unwrap-panic    |                  |
+|                      | .errval       | unwrap-err-panic |                 |
+|                      |               |                 |                  |
+| ft                   | .getBalance() | ft-get-balance  | ft.getSupply() |
+|                      | .getSupply()  | ft-get-supply   |                  |
+|                      | .transfer?()  | ft-transfer?    |                  |
+|                      | .mint?()      | ft-mint?        |                  |
+|                      | .burn?()      | ft-burn?        |                  |
+|                      |               |                 |                  |
+| nft                  | .getOwner?()  | nft-get-owner?  | nft.getOwner(u1000) |
+|                      | .transfer?()  | nft-transfer?   |                  |
+|                      | .mint?()      | nft-mint?       |                  |
+|                      | .burn?        | nft-burn?       |                  |
 
 
 
@@ -639,6 +800,7 @@ public function test() {
 }
 ```
 
+There is no literal coersion for system calls, except for those implemented as operators.
 
 ## Expressions
 
@@ -667,11 +829,16 @@ Crystalscript supports the following operators:
 | #        | unwrap | unwrap optional | #a |
 | ?:       | if-then  | if/then/else | a ? b : c |
 | ()       | call | function call | concat( [1,2], [3, 4] ) |
-| =        | assign | change a persit variable or map | data[{ index:1 }] = \{ amt:10 } |
-| ?=       | conditional assign | change a persit map entry if it doesn't exist | data[{ index:1 }] ?= \{ amt:5 } |
+| =        | assign | change a persist variable or map | data[{ index:1 }] = \{ amt:10 } |
+| ?=       | conditional assign | change a persist map entry if it doesn't exist | data[{ index:1 }] ?= \{ amt:5 } |
 | delete   | delete | delete a persist map entry | delete data[{ index:1 }] |
 | []       | brackets | derefernce something | const amt = data[{ index:1 }]["amt"] |
 | .        | dot      | dereferece something | const amt = data[{ index:1 }].amt |
+| ~        | bitwise not | one's compliment | const x = ~n >>10;       |
+| &        | bitwise and | bitwise and      | const x = u65 & u41;     |
+| \|       | bitwise or  | bitwise or       | const x = u10 | u2;      |
+| <<       | bitwise shift left | shift bits left | const x = u1 << 7; |
+| >>       | bitwise shift right | shift bits right | const x = u8 >> 7; | 
 
 
 ### Keywords
@@ -680,28 +847,28 @@ The following words are reserved by crystalscript and can't used used as identif
 
 | Keyword | Keyword |
 | ------- | ------- |
-| _countof | import |
-| as | int |
-| block-height | is-in-regtest |
-| bool | list |
-| buff | none |
-| burn-block-height | nonfungible-token |
-| const | optional |
-| contract-caller | persist |
-| declare | principal |
-| define | private |
-| delete | public |
-| else | readonly |
-| extern | response |
-| false | return |
-| foreach | string |
-| function | string-ascii |
-| fungible-token | stx-liquid-supply |
-| if | trait |
-| implement | true |
-| implements | tx-sender |
-| import | uint |
-| int | use |
+| _countof | int |
+| _typedef | is-in-regtest |
+| as | list |
+| block-height | none |
+| bool | nonfungible-token |
+| buff | optional |
+| burn-block-height | persist |
+| const | principal |
+| contract-caller | private |
+| declare | public |
+| define | readonly |
+| delete | response |
+| else | return |
+| extern | string |
+| false | string-ascii |
+| foreach | string-utf8 |
+| function | stx-liquid-supply |
+| fungible-token | trait |
+| if | true |
+| implement | tx-sender |
+| implements | uint |
+| import | use |
 
 
 
@@ -806,6 +973,10 @@ Like in Clarity, functions that return a response or optional type end with '?',
 | as-max-len? | changes the maximum size of a sequence |
 | asserts! | assert that an expression is true, or return from the function |
 | at-block |  |
+| buff-to-int-be | convert a buff in big-endian to an integer |
+| buff-to-int-le | convert a buff in little-endian to an integer |
+| buff-to-uint-be | convert a buff in big-endian to an unsigned integer |
+| buff-to-uint-le | convert a buff in little-endian to an unsigned integer |
 | concat | concatenates two sequences and returns the new sequence |
 | contract-call? | call pubic or readonly functions of other contracts |
 | contract-of | get the principal implementing a trait |
@@ -813,47 +984,61 @@ Like in Clarity, functions that return a response or optional type end with '?',
 | err | constructs an error response |
 | filter | calls a function for each element of a list and returns a new list containing elements for which the function returned true |
 | fold | obtain a value from a list where a function is called for each element of the list with the element plus the prior result |
+| from-consensus-buff? | deserialize a buffer into a Clarity value |
 | ft-burn? | remove tokens from the outstanding supply |
 | ft-get-balance | fungible token balance of a principal |
 | ft-get-supply | fungible token supply outstanding |
 | ft-mint? | mint fungible tokens and increase outstanding supply |
 | ft-transfer? | move fungible tokens between parties |
 | get-block-info? |  |
+| get-burn-block-info? |  |
 | hash160 | compute hash |
-| index-of | find an element and return it's index within a sequence |
+| index-of? | find an element and return it's index within a sequence |
+| int-to-ascii | convert number to string-ascii form |
+| int-to-utf8 | convert number to string form |
 | is-err | test whether a response is an err |
 | is-none | test whether an optional is none |
 | is-ok | test whether a response is ok |
 | is-some | test whether an optional is not none |
+| is-standard | tests whether the principal matches the current network type |
 | keccak256 | compute hash |
 | len | obtain the length of a sequence |
 | log2 | base 2 logarithm |
 | map | construct a new list from the return values of a function that's called for every element of other lists |
 | merge | combine two maps into a new map |
-| mod | division remainer. also available as "%" operator |
 | nft-burn? | destroy an nft |
 | nft-get-owner? | obtain the owner of an nft |
 | nft-mint? | create an nft |
 | nft-transfer? | transfer an nft between parties |
 | ok | constructs an ok response |
-| pow | raise to a power. also available as "**" operator |
+| principal-construct? | get a principal from a buffer |
+| principal-destruct? | convert principal into details about the principal |
 | principal-of? | get the principal from a public key |
 | print | output event |
+| replace-at? | returns a new list with the element at the selected index replaced with the new value |
 | secp256k1-recover? | obtain the public key used to sign a message |
 | secp256k1-verify | verify a signature |
 | sha256 | compute hash |
 | sha512 | compute hash |
 | sha512-256 | compute hash |
+| slice? | get a portion of a sequence |
 | sqrti | integer square root |
+| string-to-int? | convert a string to integer |
+| string-to-uint? | convert a string to an unsigned integer |
+| stx-account |  |
 | stx-burn? | destroy stx |
 | stx-get-balance | returns the principal's stx balance |
+| stx-transfer-memo? | transfer stx between two parties, with a memo |
 | stx-transfer? | transfer stx between two parties |
+| to-consensus-buff? | serialize any value into a buffer |
 | try! | return from the function if the response is err or the optional is none, otherwise returns the value |
 | unwrap! | return from the function if the response is err, or the optional's value is none, otherwise returns the value |
 | unwrap-err! | return from the function if the response is ok, otherwise returns the value |
 | unwrap-err-panic | return from the function if the response is ok, otherwise return the value |
 | unwrap-panic | return from the function if the response is err or the optional is none, otherwise return the value |
-| xor | bitwise exclusive or. also available as "^" operator |
+
+
+Please consult the [Clarity docs](https://docs.stacks.co/docs/clarity/) for details on what arguments are acceptable and what return value to expect from making system calls.
 
 Also see [type conversion functions](#type-conversion-functions).
 
