@@ -1,0 +1,27 @@
+
+public function strint() {
+    const s1 = 1.toString();
+    const s2 = u1.toString();
+    const s3 = (-1).toStringAscii();
+    const v1 = s1.toInt?();
+    const v2 = s2.toUint?();
+    const v3 = s3.toInt?();
+    const v4 = "10".toInt?();
+    const v5 = "-2".toInt?();
+    const v6 = "-2".ascii().toInt?();
+    const v7 = "-2".toUint?();
+    return ok(
+        s1=="1" &&
+            s2=="1" &&
+            s3=="-1".ascii() &&
+            v1==1 &&
+            v2==u1 &&
+            v3==-1 &&
+            v4==10 &&
+            v5==-2 &&
+            v6==-2 &&
+            v7==none
+    );
+}
+
+// TEST: strint() => ok:val===true

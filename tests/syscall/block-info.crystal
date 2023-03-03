@@ -1,0 +1,10 @@
+public function info1() {
+    const x = get-block-info?("block-reward", u1);
+    const y = get-burn-block-info?("pox-addrs".ascii(), u1);
+    return ok({
+        x:x,
+        y:y
+    });
+}
+
+// // TEST: info1() => ok:val==false

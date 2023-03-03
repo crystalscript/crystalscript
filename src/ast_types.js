@@ -77,6 +77,10 @@ import {
     optm_remove_from_array
 } from './ast_optimize.js';
 
+import {
+    make_syscall
+} from './ast_syscall.js';
+
 
 import { _fill_types_foreach } from './ast_types_foreach.js';
 import { _fill_types_brackets } from './ast_types_brackets.js';
@@ -243,6 +247,13 @@ function _fill_global_types(node, scopes, compile) {
             function_hoist: false,
             compile
         }));
+        if (type_is_one_of(node.expr, [
+            { type:'typedef' },
+            { type:'func' },
+            { type:'syscall_ref' }
+        ])) {
+            throw new SyntaxError(node.expr, `not a valid assignment, type '${pretty_type(node.expr)}'`);
+        }
         copy_type(node.expr, node);
         scopes[0].declare(node, scopes);
     }
@@ -432,6 +443,9 @@ export function _fill_types(node, node_type, scopes, opts) {
                         // eg: clarity error: "use of unresolved variable 'map'"
                         throw new NotSupportedError(stmt, `variables may not hold function references in Clarity`);
                     }
+                    if (type_is_one_of(stmt.expr, [{ type:'typedef' }])) {
+                        throw new SyntaxError(stmt, `not a valid assignment, type '${pretty_type(stmt.expr)}'`);
+                    }
                     copy_type(stmt.expr, stmt);
                 }
                 if (! opts.backfilling) {
@@ -555,6 +569,16 @@ export function _fill_types(node, node_type, scopes, opts) {
         
         else {
             _fill_types(node, 'expr', scopes, opts);
+            if (check_type(opts, node)) {
+                if (equal_types(node, any_response)) {
+                    opts.compile.warning(node, `unchecked response`);
+                    optm_reset_node(
+                        node, 
+                        make_syscall('is-ok', [optm_move_node(node,{})])
+                    );
+                    _fill_types(node, 'expr', scopes, opts);
+                }
+            }
         }
 
     }
@@ -915,10 +939,56 @@ export function _fill_types(node, node_type, scopes, opts) {
                 }
             }
         }
-        
+
+        else if (node.op == '<<' ||
+                 node.op == '>>') {
+            _fill_types(node.a, 'expr', scopes, opts);
+            _fill_types(node.b, 'expr', scopes, opts);
+            if (check_type(opts, node.a, node.b)) {
+                coerce_literal(node.b, { type:'uint' });
+                ensure_type_is_one_of(node.b, [
+                    { type:'uint' }
+                ], opts, `operator '${node.op}'`);
+                ensure_type_is_one_of(node.a, [
+                    { type:'int' },
+                    { type:'uint' }
+                ], opts, `operator '${node.op}'`);
+                copy_type(node.a, node);
+            }
+        }
+
+        else if (node.op == '~') {
+            _fill_types(node.a, 'expr', scopes, opts);
+            if (check_type(opts, node.a)) {
+                unwrap_optional(node.a);
+                ensure_type_is_one_of(node.a, [
+                    { type:'int' },
+                    { type:'uint' }
+                ], opts, `operator '${node.op}'`);
+                copy_type(node.a, node);
+            }
+        }
+
+        else if (node.op == '^' ||
+                 node.op == '&' ||
+                 node.op == '|')
+        {
+            _fill_types(node.a, 'expr', scopes, opts);
+            _fill_types(node.b, 'expr', scopes, opts);
+            if (check_type(opts, node.a, node.b)) {
+                unwrap_optional(node.a, node.b);
+                ensure_equal_types(node.a, node.b, opts,
+                                   `operator '${node.op}'`);
+                ensure_type_is_one_of(node.a, [
+                    { type:'int' },
+                    { type:'uint' }
+                ], opts, `operator '${node.op}'`);
+                copy_type(node.a, node, b);
+            }
+        }
+
         else if (node.op == '%' ||
-                 node.op == '**' ||
-                 node.op == '^')
+                 node.op == '**')
         {
             _fill_types(node.a, 'expr', scopes, opts);
             _fill_types(node.b, 'expr', scopes, opts);
@@ -926,7 +996,7 @@ export function _fill_types(node, node_type, scopes, opts) {
                 unwrap_optional(node.a, node.b);
                 coerce_literal(node.b, node.a);
                 coerce_literal(node.a, node.b);
-                ensure_equal_types(node.a,node.b, opts,
+                ensure_equal_types(node.a, node.b, opts,
                                    `operator '${node.op}'`);
                 ensure_type_is_one_of(node.a, [
                     { type:'int' },
@@ -994,7 +1064,7 @@ export function _fill_types(node, node_type, scopes, opts) {
                 
                 if (!optimized) {
                     copy_type(a, node, b);
-                    if (opts.optimized && node.op == a.op) {
+                    if (opts.optimize && node.op == a.op) {
                         // optimization: (or (or x y) z) => (or x y z)
                         a.multi.push(b);
                         optm_move_node(a, node);
@@ -1017,7 +1087,7 @@ export function _fill_types(node, node_type, scopes, opts) {
         else if (node.op == '[]' || node.op == '.') {
             _fill_types_brackets(node, node_type, scopes, opts);
         }
-        
+
         else if (node.op == 'func_call') {
             _fill_types_func_call(node, node_type, scopes, opts);
         }
@@ -1192,7 +1262,7 @@ export function _fill_types(node, node_type, scopes, opts) {
             }
         }
 
-        else if (node.op == 'countof') {
+        else if (node.op == '_countof') {
             _fill_types(node.id, 'expr', scopes, opts);
             if (check_type(opts, node.id)) {
                 var countof_node = node.id;
@@ -1200,14 +1270,24 @@ export function _fill_types(node, node_type, scopes, opts) {
                     countof_node = node.id.itemtype;
                 }
                 if (! is_sequence_type(countof_node)) {
-                    throw new SyntaxError(node, `'countof' argument of type '${pretty_type(node.id)}' is not a sequence type`);
+                    throw new SyntaxError(node, `'_countof' argument of type '${pretty_type(node.id)}' is not a sequence type`);
                 }
                 var size = countof_node.size;
-                optm_reset_node(node);
-                Object.assign(node, {
+                optm_reset_node(node, {
                     op:'lit',
                     type:'uint',
                     val:size
+                });
+            }
+        }
+
+        else if (node.op == '_typeof') {
+            _fill_types(node.id, 'expr', scopes, opts);
+            if (check_type(opts, node.id)) {
+                optm_reset_node(node, {
+                    op:'lit',
+                    type:'typedef',
+                    typedef: node.id
                 });
             }
         }

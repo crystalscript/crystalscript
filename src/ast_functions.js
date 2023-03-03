@@ -270,7 +270,9 @@ function _validate(ctx, scope, scopes) {
                 }
 
                 else {
-                    throw new SyntaxError(node, `unknown function '${node.name.id}'`);
+                    var possible = lookup_syscall(node.name.id + '?') || lookup_syscall(node.name.id + '!');
+                    if (possible) possible = possible.name;
+                    throw new SyntaxError(node, `unknown function '${node.name.id}'${possible ? ". did you mean '"+possible+"'?" : ''}`);
                 }
             }
         }

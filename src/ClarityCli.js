@@ -66,7 +66,6 @@ export default class ClarityCli {
     }
 
     load_all(dir, override_stx_addr) {
-        console.log(`load all contracts from ${dir}`);
         var entries = fs.readdirSync(dir);
         entries.forEach(file => {
             if (!/\.clar$/.test(file)) return;

@@ -123,9 +123,10 @@ export function compile_import_file(opts, fn, contract_id, as_id) {
     if (!contract_id && fs.existsSync(import_json_fn)) {
         try {
             var json =JSON.parse(fs.readFileSync(import_json_fn).toString());
-            if (json.contract_id) {
-                var val = json.contract_id[opts.compile.network] ||
-                    json.contract_id["default"];
+            var lookup = json.contract_id || json["contract-id"];
+            if (lookup) {
+                var val = lookup[opts.compile.network] ||
+                    lookup["default"];
                 if (val) {
                     contract_id = { op:'lit', type:'string', val };
                     contract_id_from_json = true;

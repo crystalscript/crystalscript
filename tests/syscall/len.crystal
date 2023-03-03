@@ -1,8 +1,8 @@
 public function basiclen() {
     const l1 = len("abc");
-    const l2 = len(0x01020304);
+    const l2 = 0x01020304.len();
     const l3 = len([ 1, 2, 3]);
-    const l4 = len(optional([ 1, 2, 3]));
+    const l4 = optional([ 1, 2, 3]).len();
     return ok([ l1, l2, l3, l4 ]);
 }
 

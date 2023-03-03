@@ -51,8 +51,17 @@ import {
     optm_reset_node
 } from './ast_optimize.js';
 
+import {
+    MAX_VALUE_SIZE
+} from './clarity_type_sizes.js';
+
 import Abi from './ast_abi.js';
 
+
+const abi_int_uint_2same = [
+    { args:[{type:'int'}], type:'int' },
+    { args:[{type:'uint'}], type:'uint' }
+];
 
 const abi_intX_uintX_2same = [
     { args:[{type:'int'},'...'],  type:'int' },
@@ -61,6 +70,11 @@ const abi_intX_uintX_2same = [
 
 const abi_intint_uintuint_2same = [
     { args:[{type:'int'},{type:'int'}],   type:'int' },
+    { args:[{type:'uint'},{type:'uint'}], type:'uint' }
+];
+
+const abi_intuint_uintuint_2same = [
+    { args:[{type:'int'},{type:'uint'}],  type:'int' },
     { args:[{type:'uint'},{type:'uint'}], type:'uint' }
 ];
 
@@ -78,7 +92,12 @@ const operatorAbi = {
     '/':   abi_intX_uintX_2same,
     '%':   abi_intint_uintuint_2same,
     '**':  abi_intint_uintuint_2same,
-    '^':   abi_intint_uintuint_2same,
+    '^':   abi_intX_uintX_2same,  // clarity1(xor), clarity2(bit-xor)
+    '~':   abi_int_uint_2same,    // clarity2
+    '&':   abi_intX_uintX_2same,  // clarity2
+    '|':   abi_intX_uintX_2same,  // clarity2
+    '<<':  abi_intuint_uintuint_2same,
+    '>>':  abi_intuint_uintuint_2same,
     '>=':  abi_intint_uintuint_2bool,
     '<=':  abi_intint_uintuint_2bool,
     '>':   abi_intint_uintuint_2bool,
@@ -98,7 +117,7 @@ const abi_hashing_fn = [
 
 
 
-export function lookup_syscall(id, all) {    
+export function lookup_syscall(id, all) {
     // _fill_type: set the return type of the syscall. called while
     //             walking the ast to fill in types. all func_call
     //             arguments will have valid types.
@@ -108,27 +127,6 @@ export function lookup_syscall(id, all) {
     }
 
     const syscalls = {
-        // operator synonyms
-        'mod': {
-            abi: abi_intint_uintuint_2same,
-            name: 'mod',
-            desc: 'division remainer. also available as "%" operator',
-            _fill_type: _simple_copy_type
-        },
-        'pow': {
-            abi: abi_intint_uintuint_2same,
-            name: 'pow',
-            desc: 'raise to a power. also available as "**" operator',
-            _fill_type: _simple_copy_type
-        },
-        'xor': {
-            abi: abi_intint_uintuint_2same,
-            name: 'xor',
-            desc: 'bitwise exclusive or. also available as "^" operator',
-            _fill_type: _simple_copy_type
-        },
-
-        // other syscalls
         
         'err': {
             abi: {
@@ -435,12 +433,11 @@ export function lookup_syscall(id, all) {
                 }
             },
             name: 'as-max-len?',
-            clarity_name: 'as-max-len?',
             desc: 'changes the maximum size of a sequence',
             _fill_type: function(func_call, abi_entry) {
                 if (func_call.args[1].op != 'lit') {
                     // just, like, why?
-                    throw new SyntaxError(func_call, `clarity's ${this.clarity_name} only accepts a literal length argument, expressions are not allowed`);
+                    throw new SyntaxError(func_call, `clarity's ${this.name} only accepts a literal length argument, expressions are not allowed`);
                 }
                 copy_type(
                     { type:'optional', itemtype:func_call.args[0] },
@@ -465,8 +462,8 @@ export function lookup_syscall(id, all) {
                 copy_type(abi_entry, func_call);
             }
         },
-        
-        'index-of': {
+
+        'index-of?': {
             abi: {
                 args: [
                     { type: 'seq' }, // sequence to search
@@ -477,7 +474,7 @@ export function lookup_syscall(id, all) {
                     type: 'uint'
                 }
             },
-            name: 'index-of',
+            name: 'index-of?',
             desc: 'find an element and return it\'s index within a sequence',
             _fill_type: function(func_call, abi_entry) {
                 if (equal_types(func_call.args[1], { type:'map' }) &&
@@ -608,7 +605,6 @@ export function lookup_syscall(id, all) {
                 }
             ],
             name: 'secp256k1-recover?',
-            clarity_name: 'secp256k1-recover?',
             desc: 'obtain the public key used to sign a message',
             _fill_type: function(func_call, abi_entry) {
                 copy_type(abi_entry, func_call);
@@ -663,7 +659,6 @@ export function lookup_syscall(id, all) {
                 },
             ],
             name: 'contract-call?',
-            clarity_name: 'contract-call?',
             desc: 'call pubic or readonly functions of other contracts',
             _fill_type: function(func_call, abi_entry, scopes, opts) {
                 var func = func_call.args[0];
@@ -739,7 +734,6 @@ export function lookup_syscall(id, all) {
                 errtype: { type:'uint' }
             },
             name: 'principal-of?',
-            clarity_name: 'principal-of?',
             desc: 'get the principal from a public key',
             _fill_type: function(func_call, abi_entry) {
                 // returns the principal derived from the public key or u1
@@ -765,34 +759,77 @@ export function lookup_syscall(id, all) {
         'get-block-info?': {
             abi: {
                 args: [
-                    { type:'string' },
+                    { type:['string', 'string-ascii'] },
                     { type:'uint' }
                 ],
                 type: 'optional',
                 itemtype: { type:'*' }
             },
             name: 'get-block-info?',
-            clarity_name: 'get-block-info?',
             desc: '',
             _fill_type: function(func_call, abi_entry) {
                 if (func_call.args[0].op != 'lit') {
-                    throw new SyntaxError(func_call, `the first argument to 'get-block-info' must be a literal string`);
+                    throw new SyntaxError(func_call, `the first argument to 'get-block-info?' must be a literal string`);
                 }
+                // set the property name to a keyword to avoid quoting
+                // when converted to clarity
+                func_call.args[0].subtype = 'keyword';
                 const valid_properties = {
                     'time': { type:'uint' },
                     'header-hash': { type:'buff', size:32n },
                     'burnchain-header-hash': { type:'buff', size:32n },
                     'id-header-hash': { type:'buff', size:32n },
                     'miner-address': { type:'principal' },
-                    'vrf-seed': { type:'buff', size:32n }
+                    'vrf-seed': { type:'buff', size:32n },
+                    'block-reward': { type:'uint' },      // clarity 2
+                    'miner-spend-total': { type:'uint' }, // clarity 2
+                    'miner-spend-winner': { type:'uint' } // clarity 2
                 };
                 var itemtype = valid_properties[func_call.args[0].val];
                 if (! itemtype) {
-                    throw new SyntaxError(func_call, `'${func_call.args[0].val}' is not a valid property name. Available property names are: ${Object.keys(valid_properties).join(',')}`);
+                    throw new SyntaxError(func_call, `'${func_call.args[0].val}' is not a valid property name. Available property names are: ${Object.keys(valid_properties).join(', ')}`);
                 }
                 copy_type({ type:'optional', itemtype}, func_call);
             }
-        },            
+        },
+
+        'get-burn-block-info?': {
+            abi: {
+                args: [
+                    { type:['string', 'string-ascii'] },
+                    { type:'uint' }
+                ],
+                type: 'optional',
+                itemtype: { type:'*' }
+            },
+            name: 'get-burn-block-info?',
+            clarver: 2,
+            desc: '',
+            _fill_type: function(func_call, abi_entry) {
+                if (func_call.args[0].op != 'lit') {
+                    throw new SyntaxError(func_call, `the first argument to 'get-burn-block-info?' must be a literal string`);
+                }
+                // set the property name to a keyword to avoid quoting
+                // when converted to clarity
+                func_call.args[0].subtype = 'keyword';
+                const valid_properties = {
+                    'header-hash': { type:'buff', size:32n },
+                    'pox-addrs': { type:'map', maptype: {
+                        addrs: { type:'list', size:2n, itemtype:{
+                            type:'map', maptype:{
+                                hashbytes: { type:'buff', size:32n },
+                                version: { type:'buff', size:1n }
+                            }}},
+                        payout: { type:'uint' }
+                    }},
+                };
+                var itemtype = valid_properties[func_call.args[0].val];
+                if (! itemtype) {
+                    throw new SyntaxError(func_call, `'${func_call.args[0].val}' is not a valid property name. Available property names are: ${Object.keys(valid_properties).join(', ')}`);
+                }
+                copy_type({ type:'optional', itemtype}, func_call);
+            }
+        },
 
         'default-to': {
             abi: {
@@ -1070,7 +1107,6 @@ export function lookup_syscall(id, all) {
                 errtype: { type: 'uint' }
             },
             name: 'ft-transfer?',
-            clarity_name: 'ft-transfer?',
             desc: 'move fungible tokens between parties',
             _fill_type: function(func_call, abi_entry) {
                 copy_type(abi_entry, func_call);
@@ -1089,7 +1125,6 @@ export function lookup_syscall(id, all) {
                 errtype: { type: 'uint' }
             },
             name: 'ft-mint?',
-            clarity_name: 'ft-mint?',
             desc: 'mint fungible tokens and increase outstanding supply',
             _fill_type: function(func_call, abi_entry) {
                 copy_type(abi_entry, func_call);
@@ -1108,7 +1143,6 @@ export function lookup_syscall(id, all) {
                 errtype: { type: 'uint' }
             },
             name: 'ft-burn?',
-            clarity_name: 'ft-burn?',
             desc: 'remove tokens from the outstanding supply',
             _fill_type: function(func_call, abi_entry) {
                 copy_type(abi_entry, func_call);
@@ -1126,7 +1160,6 @@ export function lookup_syscall(id, all) {
                 itemtype: { type:'principal' }
             },       
             name: 'nft-get-owner?',
-            clarity_name: 'nft-get-owner?',
             desc: 'obtain the owner of an nft',
             _fill_type: function(func_call, abi_entry) {
                 ensure_equal_types(
@@ -1153,7 +1186,6 @@ export function lookup_syscall(id, all) {
                 errtype: { type:'uint' }
             },       
             name: 'nft-transfer?',
-            clarity_name: 'nft-transfer?',
             desc: 'transfer an nft between parties',
             _fill_type: function(func_call, abi_entry) {
                 ensure_equal_types(
@@ -1179,7 +1211,6 @@ export function lookup_syscall(id, all) {
                 errtype: { type:'uint' }
             },       
             name: 'nft-mint?',
-            clarity_name: 'nft-mint?',
             desc: 'create an nft',
             _fill_type: function(func_call, abi_entry) {
                 ensure_equal_types(
@@ -1205,7 +1236,6 @@ export function lookup_syscall(id, all) {
                 errtype: { type:'uint' }
             },       
             name: 'nft-burn?',
-            clarity_name: 'nft-burn?',
             desc: 'destroy an nft',
             _fill_type: function(func_call, abi_entry) {
                 ensure_equal_types(
@@ -1218,6 +1248,24 @@ export function lookup_syscall(id, all) {
             }
         },
 
+        'stx-account': {
+            abi: {
+                args: [{ type: 'principal' }],
+                type: 'map',
+                maptype: {
+                    locked: { type:'uint' },
+                    "unlock-height": { type:'uint' },
+                    unlocked: { type:'uint' }
+                }
+            },
+            name:'stx-account',
+            clarver: 2,
+            desc:'',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }            
+        },
+        
         'stx-get-balance': {
             abi:{
                 args: [ {type:'principal'} ],
@@ -1242,8 +1290,27 @@ export function lookup_syscall(id, all) {
                 errtype: 'uint'
             },
             name: 'stx-transfer?',
-            clarity_name: 'stx-transfer?',
             desc: 'transfer stx between two parties',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'stx-transfer-memo?': {
+            abi:{
+                args: [
+                    { type:'uint' },  // amount
+                    { type:'principal' }, // sender (must be "current context's" tx-sender)
+                    { type:'principal' }, // recipient
+                    { type:'buff', size:'*' },  // memo
+                ],
+                type: 'response',
+                oktype: 'bool',
+                errtype: 'uint'
+            },
+            name: 'stx-transfer-memo?',
+            clarver: 2,
+            desc: 'transfer stx between two parties, with a memo',
             _fill_type: function(func_call, abi_entry) {
                 copy_type(abi_entry, func_call);
             }
@@ -1260,10 +1327,303 @@ export function lookup_syscall(id, all) {
                 errtype: 'uint'
             },
             name: 'stx-burn?',
-            clarity_name: 'stx-burn?',
             desc: 'destroy stx',
             _fill_type: function(func_call, abi_entry) {
                 copy_type(abi_entry, func_call);
+            }
+        },
+
+        'buff-to-int-be': {
+            abi: {
+                args: [{ type:'buff', size:16n }],
+                type: 'int'
+            },
+            name: 'buff-to-int-be',
+            clarver: 2,
+            desc: 'convert a buff in big-endian to an integer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }            
+        },
+
+        'buff-to-int-le': {
+            abi: {
+                args: [{ type:'buff', size:16n }],
+                type: 'int'
+            },
+            name: 'buff-to-int-le',
+            clarver: 2,
+            desc: 'convert a buff in little-endian to an integer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }            
+        },
+
+        'buff-to-uint-be': {
+            abi: {
+                args: [{ type:'buff', size:16n }],
+                type: 'int'
+            },
+            name: 'buff-to-uint-be',
+            clarver: 2,
+            desc: 'convert a buff in big-endian to an unsigned integer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }            
+        },
+
+        'buff-to-uint-le': {
+            abi: {
+                args: [{ type:'buff', size:16n }],
+                type: 'int'
+            },
+            name: 'buff-to-uint-le',
+            clarver: 2,
+            desc: 'convert a buff in little-endian to an unsigned integer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'to-consensus-buff?': {
+            abi: {
+                args: [{ type:'*' }], // type:* not '+'
+                type: 'optional',
+                itemtype: {
+                    type: 'buff',
+                    size: MAX_VALUE_SIZE - 8n // (approx!) subtract serialized type prefix
+                }
+            },
+            name: 'to-consensus-buff?',
+            clarver: 2,
+            desc: 'serialize any value into a buffer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }            
+        },
+        
+        'from-consensus-buff?': {
+            abi: {
+                args: [
+                    { type:'typedef' },
+                    { type:'buff', size:'*' }
+                ],
+                type: 'optional',
+                itemtype: '*'
+            },
+            name: 'from-consensus-buff?',
+            clarver: 2,
+            desc: 'deserialize a buffer into a Clarity value',
+            _fill_type: function(func_call, abi_entry) {
+                // the deserialization returns the type specified
+                // by argument 0, or none if it fails
+                copy_type({
+                    type:'optional',
+                    itemtype:func_call.args[0].typedef
+                }, func_call);
+            }
+        },
+
+        'int-to-ascii': {
+            abi: {
+                args: [{ type:['int','uint'] }],
+                type: 'string-ascii',
+                size: 40n
+            },
+            name:'int-to-ascii',
+            clarver: 2,
+            desc: 'convert number to string-ascii form',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'int-to-utf8': {
+            abi: {
+                args: [{ type:['int','uint'] }],
+                type: 'string',
+                size: 40n
+            },
+            name:'int-to-utf8',
+            clarver: 2,
+            desc: 'convert number to string form',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+        
+        'string-to-int?': {
+            abi: [
+                {
+                    args: [{ type:'string-ascii', size:1048576n }],
+                    type: 'optional',
+                    itemtype: { type:'int' }
+                },
+                {
+                    args: [{ type:'string', size:262144n }],
+                    type: 'optional',
+                    itemtype: { type:'int' }
+                }
+            ],
+            name:'string-to-int?',
+            clarver: 2,
+            desc: 'convert a string to integer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'string-to-uint?': {
+            abi: [
+                {
+                    args: [{ type:'string-ascii', size:1048576n }],
+                    type: 'optional',
+                    itemtype: { type:'uint' }
+                },
+                {
+                    args: [{ type:'string', size:262144n }],
+                    type: 'optional',
+                    itemtype: { type:'uint' }
+                }
+            ],
+            name:'string-to-uint?',
+            clarver: 2,
+            desc: 'convert a string to an unsigned integer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'is-standard': {
+            abi: {
+                args: [{ type:'principal' }],
+                type: 'bool'
+            },
+            name:'is-standard',
+            clarver: 2,
+            desc: 'tests whether the principal matches the current network type',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'principal-construct?': {
+            abi:[
+                {
+                    args: [
+                        { type:'buff', size:1n },
+                        { type:'buff', size:20n }
+                    ],
+                    type:'response',
+                    oktype: { type:'principal' },
+                    errtype: { type:'map', maptype:{
+                        error_code: {
+                            type:'uint'
+                        },
+                        value: {
+                            type:'optional',
+                            itemtype: { type:'principal' }
+                        }
+                    }}
+                },
+                
+                {
+                    args: [
+                        { type:'buff', size:1n },
+                        { type:'buff', size:20n },
+                        { type:'string-ascii', size:40n }
+                    ],
+                    type:'response',
+                    oktype: { type:'principal' },
+                    errtype: { type:'map', maptype:{
+                        error_code: {
+                            type:'uint'
+                        },
+                        value: {
+                            type:'optional',
+                            itemtype: { type:'principal' }
+                        }
+                    }}
+                },
+            ],
+            name:'principal-construct?',
+            clarver: 2,
+            desc: 'get a principal from a buffer',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'principal-destruct?': {
+            abi: {
+                args: [{ type:'principal' }],
+                type: 'response',
+                oktype: { type:'map', maptype:{
+                    "hash-bytes": { type:'buff', size:20n },
+                    name: {
+                        type:'optional',
+                        itemtype:{ type:'string-ascii', size:40n }
+                    },
+                    version: { type:'buff', size:1n }
+                }},
+                errtype: { type:'map', maptype:{   // same as oktype
+                    "hash-bytes": { type:'buff', size:20n },
+                    name: {
+                        type:'optional',
+                        itemtype:{ type:'string-ascii', size:40n }
+                    },
+                    version: { type:'buff', size:1n }
+                }}
+            },
+            name:'principal-destruct?',
+            clarver: 2,
+            desc: 'convert principal into details about the principal',
+            _fill_type: function(func_call, abi_entry) {
+                copy_type(abi_entry, func_call);
+            }
+        },
+
+        'replace-at?': {
+            abi: {
+                args: [
+                    { type:'seq' },
+                    { type:'uint' },   // index to replace
+                    { type:'*' }       // new value, incl. optional
+                ],
+                type: 'optional',   // 'none' if index out of range
+                itemtype: '*'       // list of the same type as arg0
+            },
+            name: 'replace-at?',
+            clarver: 2,
+            desc: 'returns a new list with the element at the selected index replaced with the new value',
+            _fill_type: function(func_call, abi_entry) {
+                // returns a list of same type, except optional
+                copy_type({
+                    type:'optional',
+                    itemtype:func_call.args[0]
+                }, func_call);
+            }
+        },
+
+        'slice?': {
+            abi: {
+                args: [
+                    { type:'seq' },
+                    { type:'uint' }, // left index
+                    { type:'uint' }  // right index (non-inclusive)
+                ],
+                type: 'optional',
+                itemtype:'*'
+            },
+            name: 'slice?',
+            clarver: 2,
+            desc: 'get a portion of a sequence',
+            _fill_type: function(func_call, abi_entry) {
+                // returns a list of same type, except optional
+                copy_type({
+                    type:'optional',
+                    itemtype:func_call.args[0]
+                }, func_call);
             }
         },
         
@@ -1280,7 +1640,9 @@ export function lookup_syscall(id, all) {
         }
     }
 
+    // for docs
     if (!id && all) return syscalls;
+
     return syscalls[id];
 }
 

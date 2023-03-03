@@ -47,6 +47,7 @@ stx_address                 [S][A-Z0-9]{39,40}
 "return"                    return 'RETURN';
 "foreach"                   return 'FOREACH';
 "_countof"                  return 'COUNTOF';
+"_typeof"                   return 'TYPEOF';
 
 // types
 "list"                      return 'LIST';
@@ -88,7 +89,12 @@ stx_address                 [S][A-Z0-9]{39,40}
 "/"                         return 'DIVIDE';
 "%"                         return 'MOD';
 "**"                        return 'POW';
-"^"                         return 'XOR';
+"^"                         return 'BIT_XOR';
+"~"                         return 'BIT_NOT';
+"&"                         return 'BIT_AND';
+"|"                         return 'BIT_OR';
+'<<'                        return 'BIT_SHIFT_LEFT';
+'>>'                        return 'BIT_SHIFT_RIGHT';
 ">="                        return 'GTE';
 "<="                        return 'LTE';
 ">"                         return 'GT';

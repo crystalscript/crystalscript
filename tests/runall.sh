@@ -143,6 +143,14 @@ runtest syscall/append.crystal
 runtest syscall/concat.crystal
 runtest syscall/len.crystal
 runtest syscall/index-of.crystal
+runtest syscall/replace-at.crystal
+runtest syscall/slice.crystal
 runtest syscall/filter.crystal
 runtest syscall/asserts.crystal
 runtest syscall/asserts2.crystal
+runtest syscall/buff-to.crystal
+runtest syscall/consensus-buff.crystal
+runtest syscall/block-info.crystal
+runtest syscall/integer-string.crystal
+runtest syscall/is-standard.crystal
+runtest syscall/principal-construct.crystal

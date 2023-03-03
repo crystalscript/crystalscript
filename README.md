@@ -1,6 +1,6 @@
 [![tests](https://github.com/crystalscript/crystalscript/actions/workflows/commit-tests.yml/badge.svg)](https://github.com/crystalscript/crystalscript/actions)
 
-# Crystal Script - transpiler for Stacks smart contracts
+# Crystal Script - compiler for Stacks smart contracts
 
 Crystal Script transforms the crystalscript language into Clarity, the smart contract language for deployment on the Stacks blockchain.
 
@@ -43,7 +43,7 @@ public function mint-mbot-nft(name string[50])
 
 ## How to use
 
-#### Compile a smart contract
+#### Compile a smart contract to Clarity
 ```
 $ crystalscript /path/to/file.crystal
 saved: /path/to/file.crystal.clar
@@ -69,11 +69,13 @@ test 1: (mint-mbot-nft u"Ava")
   success: ok and 'val===true' is true
 ```
  
- 
 *\* Note: to deploy and run embedded tests locally in a mock Stacks environment, 'clarity-cli' from [stacks-blockchain](https://github.com/stacks-network/stacks-blockchain) must be installed and in the path (or its location specified by the CLARITY_CLI environment variable).*
+
+crystalscript does not deploy compiled code to Stacks testnet and mainnet. You could try [@stacks/cli](https://www.npmjs.com/package/@stacks/cli) for that.
 
 
 For additional compilation options, run `crystalscript` with no arguments.
+
 
 
 ## Documentation
@@ -87,7 +89,7 @@ For language details, please see the Crystal Script Language Reference [docs/lan
 
 The author believes Clarity is difficult to use and that the Stacks ecosystem could benefit from a language that is easier to understand and maintain.
 
-For example, the Crystal Script expression "a + b / c" would be coded, using Clarity's "pure functional", Lisp-like syntax, as "(+ a (/ b c))". Although this is a simple example, you can see how it could get difficult to understand in a larger context.
+For example, the Crystal Script expression "(~n >> u124) + u1" would be coded, using Clarity's "pure functional", Lisp-like syntax, as "(+ (bit-shift-right (bit-not n) u124) u1))". Although this is a simple example, you can see how it could get difficult to read in a larger context.
 
 
 ## Support

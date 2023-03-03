@@ -49,12 +49,15 @@
 %right EXPR_IF
 %left OR
 %left AND
+%left BIT_OR
+%left BIT_AND
 %left EQUALS NOTEQUALS
 %left GTE LTE GT LT
+%left BIT_SHIFT_LEFT BIT_SHIFT_RIGHT
 %left PLUS MINUS
-%left MULTIPLY DIVIDE MOD POW XOR
+%left MULTIPLY DIVIDE MOD POW BIT_XOR
 %left ARROW
-%right NOT DELETE UNWRAP
+%right NOT DELETE UNWRAP BIT_NOT
 %left DOT LBRACKET LPAREN
 
 %start prog
@@ -297,8 +300,18 @@ expr
       {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}
     | expr POW expr
       {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}
-    | expr XOR expr
+    | BIT_NOT expr
+      {{ $$ = { op:$1, type:null, line:getLine(this._$), a:$2 }; }}
+    | expr BIT_XOR expr
       {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}
+    | expr BIT_AND expr
+      {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}      
+    | expr BIT_OR expr
+      {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}      
+    | expr BIT_SHIFT_LEFT expr
+      {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}      
+    | expr BIT_SHIFT_RIGHT expr
+      {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}      
     | expr GTE expr
       {{ $$ = { op:$2, type:null, line:getLine(this._$), a:$1, b:$3 }; }}
     | expr LTE expr
@@ -339,7 +352,9 @@ expr
     | DELETE expr
       {{ $$ = { op:'delete', lval:$2, type:null, line:getLine(this._$) }; }}
     | COUNTOF LPAREN ID RPAREN
-      {{ $$ = { op:'countof', id:{op:'id', id:$3, type:null}, line:getLine(this._$) }; }}
+      {{ $$ = { op:'_countof', id:{op:'id', id:$3, type:null}, line:getLine(this._$) }; }}
+    | TYPEOF LPAREN ID RPAREN
+      {{ $$ = { op:'_typeof', id:{op:'id', id:$3, type:null}, line:getLine(this._$) }; }}
     ;
 
 
@@ -379,11 +394,15 @@ func_call
 
 func_args
     : operator COMMA func_args
-      {{ $$ = prependChild($3, { op:'id', id:$1} ); }}
+      {{ $$ = prependChild($3, { op:'id', id:$1 }); }}
+    | serializable_type COMMA func_args
+      {{ $$ = prependChild($3, { op:'lit', type:'typedef', typedef:$1 }); }}
     | expr COMMA func_args
       {{ $$ = prependChild($3, $1); }}
     | operator
       {{ $$ = [{ op:'id', id:$1 }]; }}
+    | serializable_type
+      {{ $$ = [{ op:'lit', type:'typedef', typedef:$1 }]; }}
     | expr
       {{ $$ = [$1]; }}
     |
@@ -393,7 +412,7 @@ func_args
 operator
     // these should match the operatorAbi list in ast_syscall.js
     // they're valid arguments to syscalls 'map' and 'fold'
-    : PLUS | MINUS | MULTIPLY | DIVIDE | MOD | POW | XOR | GTE | LTE | GT | LE | EQUALS | AND | OR | NOT
+    : PLUS | MINUS | MULTIPLY | DIVIDE | MOD | POW | BIT_XOR | BIT_NOT | BIT_AND | BIT_OR | BIT_SHIFT_LEFT | BIT_SHIFT_RIGHT | GTE | LTE | GT | LE | EQUALS | AND | OR | NOT
     ;
 
 anon_func_def
@@ -415,6 +434,12 @@ type
     : OPTIONAL actual_type
       {{ $$ = { type:'optional', itemtype:$2, line:getLine(this._$) }; }}
     | trait_type
+    | actual_type
+    ;
+
+serializable_type
+    : OPTIONAL actual_type
+      {{ $$ = { type:'optional', itemtype:$2, line:getLine(this._$) }; }}
     | actual_type
     ;
 

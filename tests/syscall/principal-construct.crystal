@@ -1,0 +1,31 @@
+public function pc() {
+    const p1 = principal-construct?(
+        0x16,
+        0xfa6bf38ed557fe417333710d6033e9419391a320
+    );
+    
+    const p2 = principal-construct?(
+        0x16,
+        0xfa6bf38ed557fe417333710d6033e9419391a320,
+        "foo".ascii()
+    );
+
+    const pd1 = principal-destruct?(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY);
+    const pd2 = principal-destruct?(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo);
+
+    const all_ok = p1.isok() &&
+          p2.isok() &&
+          pd1.isok() &&
+          pd2.isok() &&
+          pd2.okval.name=="foo".ascii();
+    
+    return ok({
+        p1:p1.isok(),
+        p2:p2.isok(),
+        pd1: pd1.isok(),
+        pd2: pd2.isok(),
+        all_ok: all_ok
+    });
+}
+
+// TEST: pc() => ok: val.all_ok.value==true

@@ -4,7 +4,7 @@ public function ixof(i optional int, s optional string[2]) {
         { a: 1, s:"ab" },
         { a: 2, s:"cd" }
     ];
-    const m = index-of(lst, { a:i, s:s });
+    const m = index-of?(lst, { a:i, s:s });
     return m ? ok(int(m)) : ok(-1);
 }
 // TEST: ixof((some 1),(some u"ab")) => ok: val==0
@@ -12,8 +12,20 @@ public function ixof(i optional int, s optional string[2]) {
 
 public function ixof2() {
     const l = 0x01020304;
-    return ok(index-of(l, optional(0x02)));
+    return ok(index-of?(l, optional(0x02)));
 }
 // TEST: ixof2() => ok: val.value==1
 
-    
+public function ixof3() {
+    const idx1 = 0x01020304.indexOf?(0x02);
+    const idx2 = optional("abc").indexOf?("b");
+    const idx3 = [1,2,3].indexOf?(optional(2));
+    const idx4 = "abc".ascii().indexOf?("c".ascii());
+    return ok({
+        idx1: #idx1,
+        idx2: #idx2,
+        idx3: #idx3,
+        idx4: #idx4
+    });
+}
+// TEST: ixof3() => ok:val.idx1.value==1 && val.idx2.value==1 && val.idx3.value==1 && val.idx4.value==2

@@ -1,7 +1,7 @@
 public function ccat() {
-    const s = concat("a","b");
-    const b = concat(0x01, 0x02);
-    const l = concat([ ["a","b"] ], [ [ "cd", "ef" ] ]);
+    const s = "a".concat("b");
+    const b = 0x01.concat(0x02);
+    const l = [ ["a","b"] ].concat([ [ "cd", "ef" ] ]);
     return ok({
         s:s,
         b:b,
@@ -12,7 +12,7 @@ public function ccat() {
 // TEST: ccat() => ok: val.s.value=="ab" && val.b.value=="0x0102" && val.l.value.length==2 && val.l.value[1].value[1].value == "ef"
 
 public function ccat2(l2 optional list<int>[2]) {
-    return ok(concat([1,2], l2));
+    return ok([1,2].concat(l2));
 }
 // TEST: ccat2((some (list 3 4))) => ok: val.length==4
 
