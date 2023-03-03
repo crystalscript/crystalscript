@@ -77,6 +77,10 @@ import {
     optm_remove_from_array
 } from './ast_optimize.js';
 
+import {
+    make_syscall
+} from './ast_syscall.js';
+
 
 import { _fill_types_foreach } from './ast_types_foreach.js';
 import { _fill_types_brackets } from './ast_types_brackets.js';
@@ -565,6 +569,16 @@ export function _fill_types(node, node_type, scopes, opts) {
         
         else {
             _fill_types(node, 'expr', scopes, opts);
+            if (check_type(opts, node)) {
+                if (equal_types(node, any_response)) {
+                    opts.compile.warning(node, `unchecked response`);
+                    optm_reset_node(
+                        node, 
+                        make_syscall('is-ok', [optm_move_node(node,{})])
+                    );
+                    _fill_types(node, 'expr', scopes, opts);
+                }
+            }
         }
 
     }
