@@ -28,7 +28,7 @@ persist mbot as nonfungible-token identified by string[50];
 // Mint your own mbot!
 public function mint-mbot-nft(name string[50])
 {
-    const result = nft-mint?(mbot, name, tx-sender);
+    const result = mbot.mint?(name, tx-sender);
     if (result.iserr()) {
          // sorry, that name is taken...
          return err(false);
