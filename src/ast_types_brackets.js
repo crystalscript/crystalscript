@@ -108,10 +108,16 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
             { type:'optional', itemtype:{ type:'int' } },
             { type:'optional', itemtype:{ type:'uint' } }
         ];
+        const valid_string_types = [
+            { type:'string' },
+            { type:'string-ascii' },
+            { type:'optional', itemtype:{ type:'string' }},
+            { type:'optional', itemtype:{ type:'string-ascii' }}
+        ];
 
         var is_seq = type_is_one_of(node.expr, valid_seq_types);
-        var is_list = type_is_one_of(node.expr, valid_list_types);
         var is_integer = type_is_one_of(node.expr, valid_integer_types);
+        var is_list = type_is_one_of(node.expr, valid_list_types);
         var is_map = type_is_one_of(node.expr, valid_map_types);
         var is_datamap = equal_types(node.expr, { type:'datamap' });
         var is_response = equal_types(node.expr, any_response);
@@ -142,10 +148,22 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
                 'replaceAt?': 'replace-at?',
                 'slice?': 'slice?',
                 'len': 'len',
+            };
+            const string_only_properties = {
                 'toInt?': 'string-to-int?',
                 'toUint?': 'string-to-uint?'
             };
+            const list_only_properties = {
+                'append': 'append'
+            };
+
+            var is_string = type_is_one_of(node.expr, valid_string_types);
             var syscall_name = properties[node.bracket.val];
+            
+            if (! syscall_name && is_string)
+                syscall_name = string_only_properties[node.bracket.val];
+            else if (!syscall_name && is_list)
+                syscall_name = list_only_properties[node.bracket.val];
             
             if (node.bracket.val == 'ascii') {
                 if (node.expr.op != 'lit' ||
@@ -160,16 +178,6 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
                     syscall: lookup_internal_call('_utf8-to-ascii')
                 });
             }
-            else if (is_list && node.bracket.val == 'append') {
-                // append only works on a list
-                optm_reset_node(node, {
-                    op:'id',
-                    id:'append',
-                    type: 'syscall_ref',
-                    bind: [ node.expr ],
-                    syscall: lookup_syscall('append')
-                });                
-            }
             else if (syscall_name) {
                 optm_reset_node(node, {
                     op:'id',
@@ -180,7 +188,15 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
                 });
             }
             else {
-                throw new PropertyNotFoundError(node, `operator '${node.op}'. unknown property '${node.bracket.val}'. Valid properties are ascii, append, ${Object.keys(properties).join(', ')}`);
+                var valid = Object.keys(properties);
+                if (is_string) {
+                    valid.push(...Object.keys(string_only_properties));
+                    if (node.expr.op == 'lit') valid.push('ascii');
+                }
+                else if (is_list)
+                    valid.push(...Object.keys(list_only_properties));
+                
+                throw new PropertyNotFoundError(node, `operator '${node.op}'. unknown property '${node.bracket.val}'. Valid properties are ${valid.join(', ')}`);
             }
         }
 
