@@ -1,0 +1,18 @@
+public function test1_replace_at() {
+    const str1 = "a_c".replaceAt?(uint(1), "b");
+    const str2 = "a_c".ascii().replaceAt?(u1, "b".ascii());
+    const buff1 = 0x0000020304.replaceAt?(u1, 0x01);
+    const buff2 = 0x0000020304.replaceAt?(optional(u1), 0x01);
+    const list1 = [ 1, 0, 3 ].replaceAt?(u1, 2);
+    const list2 = optional(["a", "b", "c"]).replaceAt?(u1, "B");
+    return ok({
+        str1: #str1,
+        str2: #str2,
+        buff1: #buff1,
+        buff2: #buff2,
+        list1: #list1,
+        list2: #list2
+    });
+}
+
+// TEST: test1_replace_at() => ok:val.str1.value=="abc" && val.str2.value=="abc" && val.buff1.value=="0x0001020304" && val.buff2.value=="0x0001020304" && val.list1.value[1].value==2 && val.list2.value[1].value=="B"

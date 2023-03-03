@@ -252,6 +252,9 @@ function c2c_lit(expr) {
         // precede name with clarity principal designator single-quote
         return new ClarListLit(expr, `'${expr.val}`);
     }
+    else if (expr.type == 'typedef') {
+        return c2c_typedef(expr.typedef);
+    }
     else {
         throw new InternalError(expr, `unhandled literal '${safeStringify(expr)}'`);
     }
@@ -357,7 +360,7 @@ function c2c_expr(expr) {
                 'unwrap-panic',
                 new ClarList(
                     null,
-                    'element-at',
+                    'element-at?',
                     c2c_expr(expr.expr),
                     c2c_expr(expr.bracket)
                 )
@@ -424,12 +427,31 @@ function c2c_expr(expr) {
             c2c_expr(expr.b)
         );
     }
-    else if (expr.op == '^') {
+    else if (expr.op == '^' ||
+             expr.op == '&' ||
+             expr.op == '|' ||
+             expr.op == '<<' ||
+             expr.op == '>>') 
+    {
+        const lookup={
+            '^': 'bit-xor',
+            '&': 'bit-and',
+            '|': 'bit-or',
+            '<<': 'bit-shift-left',
+            '>>': 'bit-shift-right'
+        };
         return new ClarList(
             expr,
-            'xor',
+            lookup[expr.op],
             c2c_expr(expr.a),
             c2c_expr(expr.b)
+        );
+    }
+    else if (expr.op == '~') {
+        return new ClarList(
+            expr,
+            'bit-not',
+            c2c_expr(expr.a)
         );
     }
     

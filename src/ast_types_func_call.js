@@ -87,7 +87,7 @@ export function _fill_types_func_call(node, node_type, scopes, opts) {
     var def = func.func_def || func.syscall;
 
     // add bound args
-    if (func.bind) node.args.unshift(...func.bind);
+    if (func.bind) node.args.unshift(...func.bind);    
     
     if (! def.abi) {
         // func_def
@@ -96,7 +96,7 @@ export function _fill_types_func_call(node, node_type, scopes, opts) {
         // if the called function needs them
         coerce_func_call_args(def, node);
     }
-    
+
     var abi = new Abi(def.name, def.abi || def);
     var abi_entry = abi.match_func_call(node, { unwrap_optional:true }); // throws
     if (def._fill_type) {

@@ -1,0 +1,17 @@
+
+public function test-slice1() {
+    const s = "abc";
+    const str1 = s.slice?(u1, s.len());
+    const str2 = "abc".ascii().slice?(u0,u1);
+    const buff1 = 0x010203.slice?(optional(u1),u2);
+    const list1 = [ 1, 2, 3].slice?(u0, u1);
+    return ok({
+        str1:  #str1,
+        str2:  #str2,
+        buff1: #buff1,
+        list1: #list1
+    });
+}
+
+//TEST: test-slice1() => ok:val.str1.value=="bc" && val.str2.value=="a" && val.buff1.value=="0x02" && val.list1.value[0].value==1
+

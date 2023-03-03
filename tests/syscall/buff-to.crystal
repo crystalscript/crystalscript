@@ -1,0 +1,28 @@
+public function b2int() {
+    const t1 = buff-to-int-be(0x01);
+    const t2 = buff-to-int-be(0x);
+    const t3 = buff-to-int-le(0x01);
+    const t4 = buff-to-int-le(optional(0xffffffffffffffffffffffffffffffff));
+    return ok({
+        t1:t1,
+        t2:t2,
+        t3:t3,
+        t4:t4
+    });
+}
+// TEST:b2int() => ok:val.t1.value==1 && val.t2.value==0 && val.t3.value==1 && val.t4.value==-1
+
+
+public function b2uint() {
+    const t1 = buff-to-uint-be(0x01);
+    const t2 = buff-to-uint-be(0x);
+    const t3 = buff-to-uint-le(0x01);
+    const t4 = buff-to-uint-le(optional(0xffffffffffffffffffffffffffffffff));
+    return ok({
+        t1:t1,
+        t2:t2,
+        t3:t3,
+        t4:t4
+    });
+}
+// TEST:b2uint() => ok:val.t1.value==1 && val.t2.value==0 && val.t3.value==1 && val.t4.value==340282366920938463463374607431768211455n

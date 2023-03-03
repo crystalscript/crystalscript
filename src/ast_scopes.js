@@ -65,7 +65,7 @@ export function make_scope(node, desc) {
         var declared_map = null;
 
         // modify the scope list: remove the scopes from the root
-        // scope +1 to the first globaled func def
+        // scope +1 to the first globalized func def
         var globalized_scopes = [ ];
         if (! node.globalized_name) {
             for (var idx=scopes.length-1; idx>=1; idx--) {

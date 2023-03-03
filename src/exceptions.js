@@ -136,6 +136,12 @@ export class MapKeyNotFoundError extends ParserError{
         this.name = 'MapKeyNotFoundError';
     }
 };
+export class PropertyNotFoundError extends ParserError{
+    constructor(...args) {
+        super(...args);
+        this.name = 'PropertyNotFoundError';
+    }
+};
 export class UndeclaredIdentifierError extends ParserError{
     constructor(...args) {
         super(...args);

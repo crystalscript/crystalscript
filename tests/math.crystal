@@ -8,13 +8,28 @@ public function math1() {
     const p2 = (u1 + -2);
     const p3 = u3 + (- 2);
     const x = 7 ^ 11;
-    const x2 = xor(7,11);
     const po1 = 2 ** 3;
-    const po2 = pow(2,3);
     const mm1 = 1 + 11 % 3;
-    const mm2 = mod(u11,u3);
     const sq1 = sqrti(u16);
     const l1 = log2(16);
+
+    // clarity2
+    const sl1 = 16 << 2;
+    const sl2 = 16 << u2;
+    const sl3 = u16 << 2;
+    const sr1 = 64 >> 2;
+    const sr2 = 64 >> u2;
+    const sr3 = u64 >> 2;
+
+    const and1 = 7 & 2;
+    const and2 = u7 & u2;
+
+    const or1 = 8 | 1;
+    const or2 = u8 | u1;
+
+    const not1 = ~3;
+    const not2 = ~u128;
+
     
     return ok(
         { i: [
@@ -26,15 +41,25 @@ public function math1() {
             [ p2, -1 ],
             [ p3, 1 ],
             [ x, 12 ],
-            [ x2, 12 ],
             [ po1, 8 ],
-            [ po2, 8 ],
             [ mm1, 3 ],
             [ l1, 4 ],
+            [ sl1, 64 ],
+            [ sl2, 64 ],
+            [ sr1, 16 ],
+            [ sr2, 16 ],
+            [ and1, 2 ],
+            [ or1, 9 ],
+            [ not1, -4 ],
+            
         ], u: [
             [ p1, u24 ],
-            [ mm2, u2 ],
             [ sq1, u4 ],
+            [ sl3, u64 ],
+            [ sr3, u16 ],
+            [ and2, u2 ],
+            [ or2, u9 ],
+            [ not2, u340282366920938463463374607431768211327 ],
         ]}
     );
 }

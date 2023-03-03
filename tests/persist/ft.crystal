@@ -10,8 +10,8 @@ persist ftx2 as fungible-token with unlimited-supply;
 
 
 public function getbal(p principal) {
-    const bal = ft-get-balance( ftx, p );
-    const sup = ft-get-supply( ftx ); // circulating supply
+    const bal = ftx.getBalance(p);
+    const sup = ftx.getSupply(); // circulating supply
     return ok({ balance:bal, supply:sup });
 }
 // TEST: getbal('SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val.balance.value == 0 && val.supply.value == 0
@@ -20,7 +20,7 @@ public function getbal(p principal) {
 public function ftx-mint(amt uint, p principal) {
     const r = worker(amt);
     function worker(amt uint) {
-        const r = ft-mint?(ftx, amt, p);
+        const r = ftx.mint?(amt, p);
         return r;
     }
     if (r.isok()) {
@@ -33,9 +33,9 @@ public function ftx-mint(amt uint, p principal) {
 
 public function ftx-burn(amt uint, p principal) {
     const r =
-          ft-burn?(ftx, amt -1, p);
+          ftx.burn?(amt -1, p);
     const siphon =
-          ft-transfer?(ftx, u1, p, SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB);
+          ftx.transfer?(u1, p, SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB);
     return r.isok() && siphon.isok() ? getbal(p) : err(r.errval);
 }
 // TEST: ftx-burn(u100, 'SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val.balance.value == 100 && val.supply.value == 101

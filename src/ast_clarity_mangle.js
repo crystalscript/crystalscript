@@ -14,8 +14,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-    InternalError
-} from './exceptions.js';
+    get_max_list_size
+} from './clarity_type_sizes.js';
+
 
 import {
     equal_types,
@@ -28,52 +29,6 @@ import {
     make_syscall
 } from './ast_syscall.js';
 
-
-// stacks-blockchain/clarity/src/vm/types/mod.rs
-const MAX_VALUE_SIZE = 1024n * 1024n; // 1MB
-const CHAR_SIZE = 4n;
-const NUMBER_SIZE = 16n;
-const BOOL_SIZE = 1n; // ??
-const STX_ADDRESS_LENGTH = 41n;
-
-function get_type_unit_size(type) {
-    // approximation
-    if (type.type == 'int' || type.type == 'uint') {
-        return NUMBER_SIZE;
-    }
-    if (type.type == 'bool') {
-        return BOOL_SIZE;
-    }
-    if (type.type == 'string') {
-        return (type.size + 1n) * CHAR_SIZE;
-    }
-    if (type.type == 'principal') {
-        if (type.subtype == 'keyword') {
-            return (STX_ADDRESS_LENGTH + 1n) * CHAR_SIZE;
-        }
-        else {
-            return (type.size + 1n) * CHAR_SIZE;
-        }
-    }
-    if (type.type == 'list') {
-        return type.size * get_max_list_size(type.itemtype);
-    }
-    if (type.type == 'map') {
-        var size = 0n;
-        for (var key in type.maptype) {
-            size += BigInt(key.length + 2) * CHAR_SIZE;
-            size += get_max_list_size(type.maptype[key]);
-        }
-        return size + 4n;
-    }
-    throw new InternalError(`unhandled type ${type.type}`);
-}
-
-function get_max_list_size(itemtype) {
-    if (itemtype.type == '-') return 0;
-    // approximation
-    return MAX_VALUE_SIZE / get_type_unit_size(itemtype) - 100n; //8n;
-}
 
 
 export function mangle_foreach_anon(anon_func_def) {

@@ -1,0 +1,14 @@
+
+public function cbuff1() {
+    const inval = {a:1, b:"b"};
+    const payload = to-consensus-buff?(inval);
+    const val1 = from-consensus-buff?(_typeof(inval), payload);
+    const val2 = from-consensus-buff?({a:int, b:string[5]}, payload);
+    return ok(
+        inval.a == val1.a &&
+        inval.a == val2.a &&
+        inval.b == val1.b &&
+        inval.b == val2.b
+    );
+}
+// TEST: cbuff1() => ok: val===true

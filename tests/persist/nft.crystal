@@ -2,13 +2,13 @@
 persist nftx as nonfungible-token identified by string[100];
 
 public function owner(name string[10]) {
-    const p = nft-get-owner?(nftx, name);
+    const p = nftx.getOwner?(name);
     return ok(p);
 }
 // TEST: owner(u"bot1") => ok: val===null
 
 public function drop(name string[10], p principal) {
-    const r = nft-mint?(nftx, name, p);
+    const r = nftx.mint?(name, p);
     return r;
 }
 // TEST: drop(u"bot1", 'SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val==true
@@ -16,7 +16,7 @@ public function drop(name string[10], p principal) {
 
 public function transfer(name string[50], from principal, to principal) {
     return
-    nft-transfer?(nftx, name, from, to);
+    nftx.transfer?(name, from, to);
 }
 // TEST: transfer(u"bot1", 'SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303, 'SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB) => ok: val==true
 // TEST: owner(u"bot1") => ok: val.value=="SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB"
@@ -24,7 +24,7 @@ public function transfer(name string[50], from principal, to principal) {
 public function burn(name string[10]) {
     const p = owner(name);
     if (p.isok() && p.okval) {
-        const r = nft-burn?(nftx, name, p.okval);
+        const r = nftx.burn?(name, p.okval);
         if (r.isok()) { return ok(true); }
     }
     return err(false);

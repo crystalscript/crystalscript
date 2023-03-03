@@ -60,6 +60,8 @@ export function run_tests(opts, input) {
 
     if (opts.newdb) {
         console.log(`creating new clarity vm db '${path.basename(opts.clarity_db)}'`);
+        if (opts.debug)
+            console.log(`initialize with contracts in ${opts.contract_library}`);
         cli.newdb(opts.contract_library);
     }
 

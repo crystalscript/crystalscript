@@ -17,6 +17,7 @@ import {
     NotSupportedError,
     TypeMismatchError,
     MapKeyNotFoundError,
+    PropertyNotFoundError,
     SyntaxError,
     UnsetReponseTypeError
 } from './exceptions.js';
@@ -88,6 +89,7 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
     _fill_types(node.bracket, 'expr', scopes, opts);
     
     if (check_type(opts, node.expr, node.bracket)) {
+
         const valid_list_types = [
             list_of_any_type,
             { type:'optional', itemtype:list_of_any_type }
@@ -96,30 +98,59 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
             { type:'map' },
             { type:'optional', itemtype:{ type:'map' } },
         ];
+        const valid_seq_types = [
+            { type:'seq' },
+            { type:'optional', itemtype:{ type:'seq' } }
+        ];
+        const valid_integer_types = [
+            { type:'int' },
+            { type:'uint' },
+            { type:'optional', itemtype:{ type:'int' } },
+            { type:'optional', itemtype:{ type:'uint' } }
+        ];
 
-        var is_string = equal_types(node.expr, { type:'string' });
+        var is_seq = type_is_one_of(node.expr, valid_seq_types);
         var is_list = type_is_one_of(node.expr, valid_list_types);
+        var is_integer = type_is_one_of(node.expr, valid_integer_types);
         var is_map = type_is_one_of(node.expr, valid_map_types);
         var is_datamap = equal_types(node.expr, { type:'datamap' });
         var is_response = equal_types(node.expr, any_response);
         var is_externdecl = equal_types(node.expr, { type:'extern_decl' });
         var is_trait = equal_types(node.expr, trait_of_any_type);
         var is_trait_def = equal_types(node.expr, { type:'trait_def' });
+        var is_ft = equal_types(node.expr, { type:'ft' });
+        var is_nft = equal_types(node.expr, { type:'nft' });
         
-        if (!is_string && !is_list && ! is_map && !is_datamap && !is_response && !is_externdecl && !is_trait && !is_trait_def) {
+        if (!is_seq && !is_list && !is_integer && !is_map && !is_datamap && !is_response && !is_externdecl && !is_trait && !is_trait_def && !is_ft && !is_nft) {
             throw new TypeMismatchError(node, `cannot operate on type '${pretty_type(node.expr)}' with '${node.op}'`);
         }
             
         coerce_literal(node.bracket, { type:'uint' });
         unwrap_optional(node.bracket);
 
-        if (is_string && node.op=='.' &&
-            equal_types(node.bracket, { type:'string' }))
-        {
-            // with dot operator, the grammer ensures the bracket can
-            // only be a literal string
+        /*
+         * any sequence accessed through dot
+         *
+         * with dot operator, the grammer ensures the bracket can only
+         * be a literal string
+         */
+        if (is_seq && node.op=='.') {
+            unwrap_optional(node.expr);
+            const properties = {
+                'concat': 'concat',
+                'indexOf?': 'index-of?',
+                'replaceAt?': 'replace-at?',
+                'slice?': 'slice?',
+                'len': 'len',
+                'toInt?': 'string-to-int?',
+                'toUint?': 'string-to-uint?'
+            };
+            var syscall_name = properties[node.bracket.val];
+            
             if (node.bracket.val == 'ascii') {
-                if (node.expr.op != 'lit')
+                if (node.expr.op != 'lit' ||
+                    !equal_types(node.expr, { type:'string' }))
+                    // optional not allowed, either
                     throw new NotSupportedError(expr, `must be a literal string to use ascii()`);
                 optm_reset_node(node, {
                     op:'id',
@@ -129,20 +160,67 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
                     syscall: lookup_internal_call('_utf8-to-ascii')
                 });
             }
+            else if (is_list && node.bracket.val == 'append') {
+                // append only works on a list
+                optm_reset_node(node, {
+                    op:'id',
+                    id:'append',
+                    type: 'syscall_ref',
+                    bind: [ node.expr ],
+                    syscall: lookup_syscall('append')
+                });                
+            }
+            else if (syscall_name) {
+                optm_reset_node(node, {
+                    op:'id',
+                    id:syscall_name,
+                    type: 'syscall_ref',
+                    bind: [ node.expr ],
+                    syscall: lookup_syscall(syscall_name)
+                });
+            }
             else {
-                throw new MapKeyNotFoundError(node, `operator '${node.op}'. invalid key '${node.bracket.val}'`);
+                throw new PropertyNotFoundError(node, `operator '${node.op}'. unknown property '${node.bracket.val}'. Valid properties are ascii, append, ${Object.keys(properties).join(', ')}`);
             }
         }
-                                                          
-        else if (is_list && equal_types(node.bracket, { type:'uint' })) {
-            if (equal_types(node.expr, optional_of_any_type)) {
-                unwrap_optional(node.expr);
+
+        /*
+         * signed & unsigned integer with dot
+         */
+        else if (is_integer && node.op=='.') {
+            unwrap_optional(node.expr);
+            const properties = {
+                'toStringAscii': 'int-to-ascii',
+                'toString': 'int-to-utf8'
+            };
+            var syscall_name = properties[node.bracket.val];
+            if (syscall_name) {
+                optm_reset_node(node, {
+                    op:'id',
+                    id:syscall_name,
+                    type: 'syscall_ref',
+                    bind: [ node.expr ],
+                    syscall: lookup_syscall(syscall_name)
+                });                
             }
+            else {
+                throw new PropertyNotFoundError(node, `operator '${node.op}'. unknown property '${node.bracket.val}'. Valid properties are ${Object.keys(properties).join(', ')}`);
+            }
+        }
+
+        /*
+         * list by [index]
+         */
+        else if (is_list && equal_types(node.bracket, { type:'uint' })) {
             // clarity element-at returns an optional, but we
             // use unwrap-panic with it
+            unwrap_optional(node.expr);
             copy_type(node.expr.itemtype, node);
         }
-        
+
+        /*
+         * map - brackets or dot
+         */
         else if (is_map && equal_types(node.bracket, { type:'string' })) {
             // clarity 'get' only accepts a literal!!!
             if (node.bracket.op !== 'lit')
@@ -171,6 +249,9 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
             }
         }
 
+        /*
+         * datamap - brackets or dot (throws)
+         */
         else if (is_datamap) {
             if (node.op == '.') {
                 throw new SyntaxError(node, `dot notation cannot be used with datamaps`);
@@ -190,11 +271,10 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
             copy_type({ type:'optional', itemtype:node.expr.valtype}, node);
         }
 
-        else if (is_response && equal_types(node.bracket, { type:'string' })) {
-            if (node.bracket.op != 'lit') {
-                throw new NotSupportedError(node, `operator '${node.op}'. indirect access to response properties is not supported.`);
-            }
-            
+        /*
+         * response with dot
+         */
+        else if (is_response && node.op=='.') {
             var has_ok = equal_types(node.expr, ok_response_of_any_type);
             var has_err = equal_types(node.expr, err_response_of_any_type);
             
@@ -233,11 +313,14 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
             }
             
             else {
-                throw new MapKeyNotFoundError(node, `operator '${node.op}'. invalid key '${node.bracket.val}'. only 'isok', 'iserr', 'okval', 'errval' are available in responses`);
+                throw new PropertyNotFoundError(node, `operator '${node.op}'. unknown property '${node.bracket.val}'`);
             }
 
         }
 
+        /*
+         * extern declaration, brackets or dot
+         */
         else if (is_externdecl && equal_types(node.bracket, { type:'string' })) {
             if (node.bracket.op != 'lit') {
                 throw new NotSupportedError(node, `operator '${node.op}'. indirect access to extern declarations is not supported.`);
@@ -272,9 +355,13 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
                 throw new NotSupportedError(found, `'${found.op}' is not a supported extern type`);
         }
 
+        /*
+         * trait - brackets or dot
+         *     the trait references a trait declaration
+         */
         else if (is_trait && equal_types(node.bracket, { type:'string' })) {
             if (node.bracket.op != 'lit') {
-                throw new NotSupportedError(node, `operator '${node.op}'. indirect access to trait declarations is not supported.`);
+                throw new NotSupportedError(node, `operator '${node.op}'. indirect access to traits is not supported.`);
             }
             var found = false;
             var traits = node.expr.itemtype.decl.traits;
@@ -296,6 +383,10 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
             }, node);
         }        
 
+        /*
+         * trait definition - brackets or dot
+         *      same as above but without extra decl deref
+         */
         else if (is_trait_def && equal_types(node.bracket, { type:'string' })) {
             if (node.bracket.op != 'lit') {
                 throw new NotSupportedError(node, `operator '${node.op}'. indirect access to trait declarations is not supported.`);
@@ -314,7 +405,58 @@ export function _fill_types_brackets(node, node_type, scopes, opts) {
                 throw new MapKeyNotFoundError(node.expr, `'${node.bracket.val}' not found in trait '${node.expr.id}'`);
             }
             copy_type({ type:'func', func_def:found }, node);
-        }        
+        }
+
+        /*
+         * fungible token with dot
+         */
+        else if (is_ft && node.op == '.') {
+            const properties = {
+                'getBalance': 'ft-get-balance',
+                'getSupply': 'ft-get-supply',
+                'transfer?': 'ft-transfer?',
+                'mint?': 'ft-mint?',
+                'burn?': 'ft-burn?'
+            };
+            var syscall_name = properties[node.bracket.val];
+            if (syscall_name) {
+                optm_reset_node(node, {
+                    op:'id',
+                    id:syscall_name,
+                    type: 'syscall_ref',
+                    bind: [ node.expr ],
+                    syscall: lookup_syscall(syscall_name)
+                });
+            }
+            else {
+                throw new PropertyNotFoundError(node, `operator '${node.op}'. unknown property '${node.bracket.val}'. Valid properties are ${Object.keys(properties).join(', ')}`);
+            }
+        }
+
+        /*
+         * non-fungible token with dot
+         */
+        else if (is_nft && node.op == '.') {
+            const properties = {
+                'getOwner?': 'nft-get-owner?',
+                'transfer?': 'nft-transfer?',
+                'mint?': 'nft-mint?',
+                'burn?': 'nft-burn?'
+            };
+            var syscall_name = properties[node.bracket.val];
+            if (syscall_name) {
+                optm_reset_node(node, {
+                    op:'id',
+                    id:syscall_name,
+                    type: 'syscall_ref',
+                    bind: [ node.expr ],
+                    syscall: lookup_syscall(syscall_name)
+                });
+            }
+            else {
+                throw new PropertyNotFoundError(node, `operator '${node.op}'. unknown property '${node.bracket.val}'. Valid properties are ${Object.keys(properties).join(', ')}`);
+            }
+        }
 
         else {
             throw new TypeMismatchError(node, `not a valid index type '${pretty_type(node.bracket)}' for '${pretty_type(node.expr)}'`);
