@@ -174,7 +174,7 @@ id2user[{ id:1 }] ?= { name:"fred", balance:u0 };
 
 ### Fungible tokens
 
-Contract declare fungible token variables to construct new fungible "currencies".
+Contracts declare fungible token variables to construct new fungible "currencies".
 
 The data associated with fungible tokens is "global" - not tied the lifetime of the called contract function.
 
@@ -487,7 +487,7 @@ public function get-last-token-id() {
 
 For more information see [https://github.com/stacksgov/sips](https://github.com/stacksgov/sips).
 
-These contracts all have different contract id's depending on what stacks network you'd deploying to (eg. testnet or mainnet). When compiling, use the `--net` argument to choose what network to compile for.
+These contracts all have different contract id's depending on what stacks network you're deploying to (eg. testnet or mainnet). When compiling, use the `--net` argument to choose what network to compile for.
 
 
 
