@@ -690,7 +690,7 @@ Some types have properties that may be accessed with the dot operator. Below is 
 | principal() | principal from string literal | principal(".contract") |
 | optional()  | make optional | optional(a) |
 | int()       | convert to int | int(a) |
-| uint()      | convert to uint | int(a) |
+| uint()      | convert to uint | uint(a) |
 
 
 ### Special literals
