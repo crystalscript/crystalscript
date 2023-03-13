@@ -257,10 +257,10 @@ VISIBILITY function NAME (NAME TYPE, ...) { STATEMENTS }
 For example:
 
 ```
-public readonly function cost (item string[10], base-price int)
+public readonly function cost (item string[10], basePrice int)
 {
-    if (item == "widget") { return ok(cost * 2); }
-    else { return ok(base-price); }
+    if (item == "widget") { return ok(basePrice * 2); }
+    else { return ok(basePrice); }
 }
 ```
 
@@ -282,17 +282,17 @@ Crystalscript allows function declarations within function bodies. These functio
 For example:
 
 ```
-    public function cost(item string[10], base-price int)
+    public function cost(item string[10], basePrice int)
     {
-        const widget-cost = compute(base-price, 2);
+        const widgetCost = compute(basePrice, 2);
 
         function compute(price int, factor int)
         {
             return price * factor;
         }
 
-        if ( item == "widget" ) { return ok(widget-cost); }
-        return ok(base-price);
+        if ( item == "widget" ) { return ok(widgetCost); }
+        return ok(basePrice);
     }
 ```
 
