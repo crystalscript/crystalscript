@@ -125,9 +125,9 @@ public function advanceCost(amt uint) {
 
 ### Data maps
 
-Persisent maps (data maps) are like hash tables, dictionaries, associatve arrays, etc. The hash or key to the map can be any type, including a map. The map value can also be any type. The map is "global" - not tied the lifetime of the called contract function.
+Persistent maps (data maps) are like hash tables, dictionaries, associatve arrays, etc. The hash or key to the data map can be any type, including a map. Data map values can also be any type. Data maps are "global" - not tied the lifetime of the called contract function.
 
-Define a persistent map using the syntax:
+Define a data map using the syntax:
 ```
 persist NAME as TYPE => TYPE;
 ```
@@ -161,7 +161,7 @@ id2user[{ id: 1 }].name = "fred sr.";   // NOT ALLOWED
 id2user[{ id: 1 }] = merge(id2user[{ id: 1 }], { name:"fred sr." });
 ```
 
-Persistent map entries can be removed with `delete`:
+Data map entries can be removed with `delete`:
 ```
 delete id2user[{ id:1 }];
 ```
@@ -829,9 +829,9 @@ Crystalscript supports the following operators:
 | #        | unwrap | unwrap optional | #a |
 | ?:       | if-then  | if/then/else | a ? b : c |
 | ()       | call | function call | concat( [1,2], [3, 4] ) |
-| =        | assign | change a persist variable or map | data[{ index:1 }] = \{ amt:10 } |
-| ?=       | conditional assign | change a persist map entry if it doesn't exist | data[{ index:1 }] ?= \{ amt:5 } |
-| delete   | delete | delete a persist map entry | delete data[{ index:1 }] |
+| =        | assign | change a persistent variable or data map entry | data[{ index:1 }] = \{ amt:10 } |
+| ?=       | conditional assign | change a data map entry if it doesn't exist | data[{ index:1 }] ?= \{ amt:5 } |
+| delete   | delete | delete a data map entry | delete data[{ index:1 }] |
 | []       | brackets | derefernce something | const amt = data[{ index:1 }]["amt"] |
 | .        | dot      | dereferece something | const amt = data[{ index:1 }].amt |
 | ~        | bitwise not | one's compliment | const x = ~n >>10;       |
