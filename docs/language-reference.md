@@ -1151,7 +1151,7 @@ Tests are added to source code in comments that start with "// TEST:". They have
 ```
 
 - *function-to-call* is the name of a public function within the source code
-- *arguments* are a comman separated list of arguments that the function should be called with. Arguments must be in Clarity syntax, so for example, a list argument must be supplied as the Clarity expression `(list 1 2 3)`. Because strings in crystalscript are utf-8, any string argument must be preceeded by 'u', for example `myfunction(u"string")`. Use Clarity's "some" function to create an optional, eg `myfunction((some 5))`.
+- *arguments* are a comma separated list of arguments that the function should be called with. Arguments must be in Clarity syntax, so for example, a list argument must be supplied as the Clarity expression `(list 1 2 3)`. Because strings in crystalscript are utf-8, any string argument must be preceeded by 'u', for example `myfunction(u"string")`. Use Clarity's "some" function to create an optional, eg `myfunction((some 5))`.
 - *ok|err|runtime-failure* are the expected response type
 - *javscript test script* is a script that returns true or false to indicate whether the function call returned the expected value.
 
