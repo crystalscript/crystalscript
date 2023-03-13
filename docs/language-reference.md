@@ -125,9 +125,9 @@ public function advanceCost(amt uint) {
 
 ### Data maps
 
-Persisent maps (data maps) are like hash tables, dictionaries, associatve arrays, etc. The hash or key to the map can be any type, including a map. The map value can also be any type. The map is "global" - not tied the lifetime of the called contract function.
+Persistent maps (data maps) are like hash tables, dictionaries, associatve arrays, etc. The hash or key to the data map can be any type, including a map. Data map values can also be any type. Data maps are "global" - not tied the lifetime of the called contract function.
 
-Define a persistent map using the syntax:
+Define a data map using the syntax:
 ```
 persist NAME as TYPE => TYPE;
 ```
@@ -161,7 +161,7 @@ id2user[{ id: 1 }].name = "fred sr.";   // NOT ALLOWED
 id2user[{ id: 1 }] = merge(id2user[{ id: 1 }], { name:"fred sr." });
 ```
 
-Persistent map entries can be removed with `delete`:
+Data map entries can be removed with `delete`:
 ```
 delete id2user[{ id:1 }];
 ```
@@ -257,10 +257,10 @@ VISIBILITY function NAME (NAME TYPE, ...) { STATEMENTS }
 For example:
 
 ```
-public readonly function cost (item string[10], base-price int)
+public readonly function cost (item string[10], basePrice int)
 {
-    if (item == "widget") { return ok(cost * 2); }
-    else { return ok(base-price); }
+    if (item == "widget") { return ok(basePrice * 2); }
+    else { return ok(basePrice); }
 }
 ```
 
@@ -282,17 +282,17 @@ Crystalscript allows function declarations within function bodies. These functio
 For example:
 
 ```
-    public function cost(item string[10], base-price int)
+    public function cost(item string[10], basePrice int)
     {
-        const widget-cost = compute(base-price, 2);
+        const widgetCost = compute(basePrice, 2);
 
         function compute(price int, factor int)
         {
             return price * factor;
         }
 
-        if ( item == "widget" ) { return ok(widget-cost); }
-        return ok(base-price);
+        if ( item == "widget" ) { return ok(widgetCost); }
+        return ok(basePrice);
     }
 ```
 
@@ -829,9 +829,9 @@ Crystalscript supports the following operators:
 | #        | unwrap | unwrap optional | #a |
 | ?:       | if-then  | if/then/else | a ? b : c |
 | ()       | call | function call | concat( [1,2], [3, 4] ) |
-| =        | assign | change a persist variable or map | data[{ index:1 }] = \{ amt:10 } |
-| ?=       | conditional assign | change a persist map entry if it doesn't exist | data[{ index:1 }] ?= \{ amt:5 } |
-| delete   | delete | delete a persist map entry | delete data[{ index:1 }] |
+| =        | assign | change a persistent variable or data map entry | data[{ index:1 }] = \{ amt:10 } |
+| ?=       | conditional assign | change a data map entry if it doesn't exist | data[{ index:1 }] ?= \{ amt:5 } |
+| delete   | delete | delete a data map entry | delete data[{ index:1 }] |
 | []       | brackets | derefernce something | const amt = data[{ index:1 }]["amt"] |
 | .        | dot      | dereferece something | const amt = data[{ index:1 }].amt |
 | ~        | bitwise not | one's compliment | const x = ~n >>10;       |
@@ -1151,7 +1151,7 @@ Tests are added to source code in comments that start with "// TEST:". They have
 ```
 
 - *function-to-call* is the name of a public function within the source code
-- *arguments* are a comman separated list of arguments that the function should be called with. Arguments must be in Clarity syntax, so for example, a list argument must be supplied as the Clarity expression `(list 1 2 3)`. Because strings in crystalscript are utf-8, any string argument must be preceeded by 'u', for example `myfunction(u"string")`. Use Clarity's "some" function to create an optional, eg `myfunction((some 5))`.
+- *arguments* are a comma separated list of arguments that the function should be called with. Arguments must be in Clarity syntax, so for example, a list argument must be supplied as the Clarity expression `(list 1 2 3)`. Because strings in crystalscript are utf-8, any string argument must be preceeded by 'u', for example `myfunction(u"string")`. Use Clarity's "some" function to create an optional, eg `myfunction((some 5))`.
 - *ok|err|runtime-failure* are the expected response type
 - *javscript test script* is a script that returns true or false to indicate whether the function call returned the expected value.
 
