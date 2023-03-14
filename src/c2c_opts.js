@@ -36,7 +36,7 @@ function usage(opts, msg) {
     console.log('');
     console.log(`options:`);
     console.log(`   -c <config.json> path to config.json`);
-    console.log(`   -o <file.clar>  output Clarity to file.clar (defaults to source.crystal.clar`);
+    console.log(`   -o <file.clar>  output Clarity to file.clar (defaults to source.crystal.clar)`);
     console.log(`   -s check syntax with clarity-cli`);
     console.log(`   -n|--contract-name <name>  specify a name for the deployed contract`);
     console.log(`   --net <network>  compile for a specific stacks network, eg "mainnet", "testnet", etc. Defaults to "dev"`);

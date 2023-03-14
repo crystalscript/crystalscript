@@ -703,7 +703,7 @@ export function _fill_types(node, node_type, scopes, opts) {
             _fill_types(node.a, 'expr', scopes, opts);
             if (check_type(opts, node.a)) {
                 if (equal_types(node.a, any_response)) {
-                    throw new SyntaxError(node, `operator '#' does not work with response types. to unwrap responses, use <response>.err and <response>.ok`);
+                    throw new SyntaxError(node, `operator '#' does not work with response types. to unwrap responses, use <response>.errval and <response>.okval`);
                 }
                 unwrap_optional(node.a);
                 optm_raise_child(node, "a");
