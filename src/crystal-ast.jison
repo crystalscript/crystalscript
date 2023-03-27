@@ -506,8 +506,13 @@ mapkeysdef
     : ID COLON type COMMA mapkeysdef
       // using Object.assign will preserve the key order
       {{ $$ = {}; $$[$1] = $3; Object.assign($$, $5); }}
+    | string_literal COLON type COMMA mapkeysdef
+      // using Object.assign will preserve the key order
+      {{ $$ = {}; $$[$1.val] = $3; Object.assign($$, $5); }}
     | ID COLON type
       {{ $$ = {}; $$[$1] = $3; }}
+    | string_literal COLON type
+      {{ $$ = {}; $$[$1.val] = $3; }}
     ;
 
 literal
@@ -568,8 +573,13 @@ map_literal_vals
     : ID COLON expr COMMA map_literal_vals
       // using Object.assign will preserve the key order
       {{ $$ = {}; $$[$1] = $3; Object.assign($$, $5); }}
+    | string_literal COLON expr COMMA map_literal_vals
+      // using Object.assign will preserve the key order
+      {{ $$ = {}; $$[$1.val] = $3; Object.assign($$, $5); }}
     | ID COLON expr
       {{ $$ = {}; $$[$1] = $3; }}
+    | string_literal COLON expr
+      {{ $$ = {}; $$[$1.val] = $3; }}
     ;
 
 list_literal
