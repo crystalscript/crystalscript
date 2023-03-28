@@ -27,3 +27,14 @@ public function fn() {
 
     return ok(true);
 }
+
+// test quoted keys
+public function is-allowed(nx { "contract-caller":principal }) {
+    const expected = { sender:tx-sender, "contract-caller":contract-caller };
+    return ok(expected == {
+        sender:tx-sender,
+        "contract-caller": nx["contract-caller"]
+    });
+}
+
+// TEST: is-allowed({contract-caller:'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P}) => ok: val===true
