@@ -1,5 +1,7 @@
 
 persist nftx as nonfungible-token identified by string[100];
+persist nftx2 as nonfungible-token identified by { name:string[100], id:int };
+persist nftx3 as nonfungible-token identified by list<uint>[2];
 
 public function owner(name string[10]) {
     const p = nftx.getOwner?(name);
@@ -9,6 +11,8 @@ public function owner(name string[10]) {
 
 public function drop(name string[10], p principal) {
     const r = nftx.mint?(name, p);
+    const r2 = nftx2.mint?({"name":name, id:0}, p);
+    const r3 = nftx3.mint?([u1,u0], p);
     return r;
 }
 // TEST: drop(u"bot1", 'SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val==true
