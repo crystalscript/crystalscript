@@ -89,6 +89,11 @@ definition
     | import_file
     ;
 
+line_termination
+    : line_termination SEMICOLON
+    | SEMICOLON
+    ;
+
 persist
     : PERSIST ID AS persist_map_def SEMICOLON
       {{ $$=$4; Object.assign($$, { op:'persist', access:'datamap', id:$2, line:getLine(this._$) }); }}
@@ -216,7 +221,7 @@ consts
     ;
     
 const
-    : CONST ID ASSIGNMENT expr SEMICOLON
+    : CONST ID ASSIGNMENT expr line_termination
       {{ $$ = { op:'vardecl', id:$2, protect:'const', type:null, line:getLine(this._$), expr:$4 }; }}
     ;
 
@@ -230,9 +235,9 @@ stmts
       {{ $$ = prependChild($2, $1); }}
     | stmt
       {{ $$ = [ $1 ]; }}
-    | expr SEMICOLON stmts
+    | expr line_termination stmts
       {{ $$ = prependChild($3, $1); }}
-    | expr SEMICOLON
+    | expr line_termination
       {{ $$ = [ $1 ]; }}
     ;
 
@@ -245,7 +250,7 @@ stmt
       {{ $$ = { op:'if', line:getLine(this._$), expr:$3, body:$6, else_body: $8 }; }}
     | func_def
       {{ $$ = $1; $$.vis='private'; }}
-    | RETURN expr SEMICOLON
+    | RETURN expr line_termination
       {{ $$ = { op:'return', type:null, line:getLine(this._$), expr:$2 }; }}
     ;
 
