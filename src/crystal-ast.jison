@@ -123,16 +123,7 @@ persist_nonfungible_token_def
     ;
 
 asset_id_type
-    : INT
-      {{ $$ = { type:'int', line:getLine(this._$) }; }}
-    | UINT
-      {{ $$ = { type:'uint', line:getLine(this._$) }; }}
-    | BUFF LBRACKET int_literal RBRACKET
-      {{ $$ = { type:'buff', line:getLine(this._$), size:$3.val }; }}
-    | STRING LBRACKET int_literal RBRACKET
-      {{ $$ = { type:'string', line:getLine(this._$), size:$3.val }; if ($3.val < 0) parserError(yy, {line:yylineno, expected:'positive integer for index'}); }}
-    | STRING-ASCII LBRACKET int_literal RBRACKET
-      {{ $$ = { type:'string-ascii', line:getLine(this._$), size:$3.val }; if ($3.val < 0) parserError(yy, {line:yylineno, expected:'positive integer for index'}); }}
+    : actual_type
     ;
 
 txt_with

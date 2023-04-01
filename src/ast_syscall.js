@@ -1153,8 +1153,7 @@ export function lookup_syscall(id, all) {
             abi: {
                 args: [
                     { type:'nft' }, // asset-class (nft name)
-                    { type:['int','uint','string','string-ascii','buff'], // asset-id
-                      size:'*' }
+                    { type:'+' }, // asset-id
                 ], 
                 type: 'optional',
                 itemtype: { type:'principal' }
@@ -1176,8 +1175,7 @@ export function lookup_syscall(id, all) {
             abi: {
                 args: [
                     { type:'nft' }, // asset-class (nft name)
-                    { type:['int','uint','string','string-ascii','buff'], // asset-id
-                      size:'*' },
+                    { type:'+' }, // asset-id
                     { type:'principal' }, // sender
                     { type:'principal' }  // recipient
                 ], 
@@ -1202,8 +1200,7 @@ export function lookup_syscall(id, all) {
             abi: {
                 args: [
                     { type:'nft' }, // asset-class (nft name)
-                    { type:['int','uint','string','string-ascii','buff'], // asset-id
-                      size:'*' },
+                    { type:'+' }, // asset-id
                     { type:'principal' }  // recipient
                 ], 
                 type: 'response',
@@ -1227,8 +1224,7 @@ export function lookup_syscall(id, all) {
             abi: {
                 args: [
                     { type:'nft' }, // asset-class (nft name)
-                    { type:['int','uint','string','string-ascii','buff'], // asset-id
-                      size:'*' },
+                    { type:'+' }, // asset-id
                     { type:'principal' }  // recipient
                 ], 
                 type: 'response',
