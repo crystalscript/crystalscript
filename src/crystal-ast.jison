@@ -87,6 +87,9 @@ definition
     | implement_trait
     | declare_extern
     | import_file
+    | if_stmt
+    | expr line_termination
+      {{ $$ = $1; }}
     ;
 
 line_termination
@@ -235,25 +238,27 @@ stmts
       {{ $$ = prependChild($2, $1); }}
     | stmt
       {{ $$ = [ $1 ]; }}
-    | expr line_termination stmts
-      {{ $$ = prependChild($3, $1); }}
-    | expr line_termination
-      {{ $$ = [ $1 ]; }}
     ;
 
 stmt
-    // if-elseif+-else*
-    : IF LPAREN expr RPAREN LBRACE consts_then_stmts RBRACE elseif else
-      {{ $$ = { op:'if', line:getLine(this._$), expr:$3, body:$6, elsif:$8, else_body: $9 }; }}
-    // if-else*
-    | IF LPAREN expr RPAREN LBRACE consts_then_stmts RBRACE else
-      {{ $$ = { op:'if', line:getLine(this._$), expr:$3, body:$6, else_body: $8 }; }}
+    : if_stmt
+    | expr line_termination
+      {{ $$ = $1; }}
     | func_def
       {{ $$ = $1; $$.vis='private'; }}
     | RETURN expr line_termination
       {{ $$ = { op:'return', type:null, line:getLine(this._$), expr:$2 }; }}
     ;
 
+if_stmt
+    // if-elseif+-else*
+    : IF LPAREN expr RPAREN LBRACE consts_then_stmts RBRACE elseif else
+      {{ $$ = { op:'if', line:getLine(this._$), expr:$3, body:$6, elsif:$8, else_body: $9 }; }}
+    // if-else*
+    | IF LPAREN expr RPAREN LBRACE consts_then_stmts RBRACE else
+      {{ $$ = { op:'if', line:getLine(this._$), expr:$3, body:$6, else_body: $8 }; }}
+   ;
+   
 elseif
     : elseif ELSE IF LPAREN expr RPAREN LBRACE consts_then_stmts RBRACE
       {{ $$ = $1; $$.push({ expr:$5, body:$8}); }}

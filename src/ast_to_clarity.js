@@ -133,7 +133,7 @@ export function to_clarity(ast, output_cb) {
             // nothing to do
         }
         else {
-            throw new InternalError(`unhandled definition=${safeStringify(definition)}`);
+            output_cb(`${c2c_body(false, [definition])}\n`);
         }
     });
 }

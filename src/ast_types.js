@@ -349,9 +349,13 @@ function _fill_global_types(node, scopes, compile) {
             scopes[0].declare(node, scopes);
         }
     }
-        
+    
     else {
-        throw new InternalError(node, `not a global op '${node.op}'`);
+        var fill_opts = new FillTypeCtx({
+            function_hoist: false,
+            compile
+        });
+        _fill_types(node, 'stmt', scopes, fill_opts);
     }
 }
 

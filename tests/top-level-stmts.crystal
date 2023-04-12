@@ -1,0 +1,6 @@
+persist rewardAdmins as principal => bool;
+rewardAdmins[tx-sender] = true;
+
+if (rewardAdmins[contract-caller] == none) {
+    rewardAdmins[contract-caller] = true;
+}
