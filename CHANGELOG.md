@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+Version 0.3.2 (April 14, 2023)
+-------------------------------
+* Allow statements at the top level (not in a function)
+* Allow extra semicolons at the end of statements
+* Allow nft asset id's to be any type
+* Allow map keys to be quoted strings
+
 Version 0.3.1
 -------------------------------
 
