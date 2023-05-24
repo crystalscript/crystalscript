@@ -58,8 +58,9 @@ mkdir -p "$(dirname "$dest_path")"
 wget --secure-protocol=PFS -q -O "$dest_path.info" "$url"
 code=$?
 
-if [ $? -ne 0 ]; then
-    echo "FAILED!"
+if [ $code -ne 0 ]; then
+    echo "FAILED! wget returned $code!"
+    wget --secure-protocol=PFS -nv -O "$dest_path.info" "$url"
     rm -f "$dest_path";
     rm -f "$dest_path.info";
 else
