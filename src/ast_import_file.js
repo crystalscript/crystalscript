@@ -29,6 +29,7 @@ import {
     equal_types,
     pretty_args,
     pretty_type,
+    pretty_principal,
 } from './ast_util.js';
 
 import compiler from './crystal-ast.cjs';
@@ -62,7 +63,7 @@ export function generate_import_file(ast, contract_name, output_cb) {
             equal_types(definition.expr, { type: 'trait_def' }))
         {
             var trait_def = definition.expr.decl;
-            trait_impl_output.push(`    implements trait ${trait_def.contract_id.val}.${trait_def.id},\n`);
+            trait_impl_output.push(`    implements trait ${pretty_principal(trait_def.contract_id.val)}.${trait_def.id},\n`);
         }
     });
     
@@ -72,7 +73,7 @@ export function generate_import_file(ast, contract_name, output_cb) {
             definition.vis=='public' || definition.vis=='read-only'))
         {
             if (definition.trait_def)
-                extern_output.push(`    // member of trait ${definition.trait_def.contract_id.val}.${definition.trait_def.id}\n`);
+                extern_output.push(`    // member of trait ${pretty_principal(definition.trait_def.contract_id.val)}.${definition.trait_def.id}\n`);
             extern_output.push(`    ${func_signature_as_text(definition)},\n`);
         }
         
@@ -128,6 +129,7 @@ export function compile_import_file(opts, fn, contract_id, as_id) {
                 var val = lookup[opts.compile.network] ||
                     lookup["default"];
                 if (val) {
+                    if (/^'/.test(val)) val=val.substr(1);
                     contract_id = { op:'lit', type:'string', val };
                     contract_id_from_json = true;
                 }

@@ -10,8 +10,8 @@ public function pc() {
         "foo".ascii()
     );
 
-    const pd1 = principal-destruct?(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY);
-    const pd2 = principal-destruct?(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo);
+    const pd1 = principal-destruct?('SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY);
+    const pd2 = principal-destruct?('SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo);
 
     const all_ok = p1.isok() &&
           p2.isok() &&
