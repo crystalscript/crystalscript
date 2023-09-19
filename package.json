@@ -22,8 +22,8 @@
         "crystalscript": "./src/c2c.js"
     },
     "bugs": {
-        "url" : "https://github.com/crystalscript/crystalscript/issues",
-        "email" : "crystalscript@athigo.com"
+        "url": "https://github.com/crystalscript/crystalscript/issues",
+        "email": "crystalscript@athigo.com"
     },
     "repository": {
         "type": "git",
@@ -34,13 +34,10 @@
     },
     "scripts": {
         "test": "tests/runall.sh",
-        "compile:grammers": "npx jison src/crystal-ast.jison src/crystal-ast.jisonlex -o src/crystal-ast.cjs; npx jison src/crystal-comments.jison -o src/crystal-comments.cjs",
-        "build:monofile": "npm run compile:grammers && npx webpack"
+        "compile:grammers": "npx jison src/crystal-ast.jison src/crystal-ast.jisonlex -o src/crystal-ast.cjs; npx jison src/crystal-comments.jison -o src/crystal-comments.cjs"
     },
     "devDependencies": {
-        "jison": "^0.4.18",
-        "webpack": "^5.75.0",
-        "webpack-cli": "^5.0.1"
+        "jison": "^0.4.18"
     },
     "dependencies": {
         "@stacks/transactions": "^6.1.1"

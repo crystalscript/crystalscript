@@ -198,8 +198,8 @@ To mint, burn, transfer, etc these tokens, see the [system calls](#system-calls)
 ```
 persist updown as fungible-token with total-supply=u1000000;
 
-const alice = SP2JPBTPVXN7V5N0SH7ZP95GM1GTFVT8SKVAW3R77;
-const bob = SP3WT3PT3NA5SWW82DZ8ZFK8RN412AD3KR5Q7Q3K4;
+const alice = 'SP2JPBTPVXN7V5N0SH7ZP95GM1GTFVT8SKVAW3R77;
+const bob = 'SP3WT3PT3NA5SWW82DZ8ZFK8RN412AD3KR5Q7Q3K4;
 
 public function mint-and-give() {
     updown.mint?(u100, alice);
@@ -233,8 +233,8 @@ To mint, burn, transfer, etc these tokens, see the [system calls](#system-calls)
 ```
 persist nifty as nonfungible-token identified by string[50];
 
-const alice = SP2JPBTPVXN7V5N0SH7ZP95GM1GTFVT8SKVAW3R77;
-const bob = SP3WT3PT3NA5SWW82DZ8ZFK8RN412AD3KR5Q7Q3K4;
+const alice = 'SP2JPBTPVXN7V5N0SH7ZP95GM1GTFVT8SKVAW3R77;
+const bob = 'SP3WT3PT3NA5SWW82DZ8ZFK8RN412AD3KR5Q7Q3K4;
 
 public function mint-and-give() {
     nifty.mint?("roo", alice);
@@ -324,7 +324,7 @@ The import file contains declarations that allow other contracts to access it's 
 
 The first import statement requires a CONTRACT-ID and ID.
 
-CONTRACT-ID is an abolute or relative contract principal. eg. "ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.contract-name" or ".contract-name", respectively. And, ID is an identifier used to refer to the contract in the program.
+CONTRACT-ID is an abolute or relative contract principal. eg. "'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.contract-name" or ".contract-name", respectively. And, ID is an identifier used to refer to the contract in the program.
 
 The definitions of the imported file will be assocated with the contract-id specified. At deployment time, the contract must exist and contain those definitions or Stacks will reject the contract.
 
@@ -588,7 +588,7 @@ Crystalscript supports all the same types as Clarity. Strings default to utf-8. 
 | int  | Signed whole number |   [-]{digits}             | const n = -10; |
 | uint | Unsigned positive whole number|"u"{digits}       | const n = u5; |
 | bool | Boolean true/false | true or false | const b = true; |
-| principal | relative or absolute contract id | .contract or stacks-address.contract | const p = .mycontract; const p2 = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.mycontract; |
+| principal | relative or absolute contract id | .contract or 'stacks-address.contract | const p = .mycontract; const p2 = 'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.mycontract; |
 
 #### Sequence types
 

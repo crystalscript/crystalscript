@@ -1,5 +1,5 @@
 
-import ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.mycontract
+import 'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.mycontract
     from "./mycontract.import" as mycontract;
 
 implement trait mycontract.name-trait;

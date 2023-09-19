@@ -19,7 +19,8 @@ digit                       [0-9]
 hex_digit                   [0-9A-Fa-f]
 id                          [a-zA-Z][a-zA-Z0-9-_]*[!?]{0,1}
 quoted_string               \"(?:[^"\\]|\\.)*\"
-stx_address                 [S][A-Z0-9]{39,40}
+stx_address                 [\'][S][A-Z0-9]+
+//stx_address                 [S][A-Z0-9]{39,40}
 
 %%
 
