@@ -4,8 +4,8 @@ public function test() {
     // on testnet.  b1 and b2 should be true on testnet, false on
     // mainnet.  the dev environment with clarity-cli is returning
     // false (mainnet)
-    const b1 = is-standard(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6);
-    const b2 = is-standard(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo);
+    const b1 = is-standard('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6);
+    const b2 = is-standard('STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo);
     return ok({
         b1:b1,
         b2:b2

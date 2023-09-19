@@ -532,7 +532,7 @@ literal
     | NONE
       {{ $$ = {op:'lit', type:'none', line:getLine(this._$), subtype:'keyword', val:yytext }; }}
     | STX_ADDRESS
-      {{ $$={ op:'lit', type:'principal', line:getLine(this._$), val:$1 }; }}
+      {{ $$={ op:'lit', type:'principal', line:getLine(this._$), val:$1.substr(1) }; }}
     | string_literal
     | int_literal
     | bool_literal
@@ -599,7 +599,7 @@ list_literal_vals
 
 contract_id
     : STX_ADDRESS contract_id_relative
-      {{ $$=$2; $$.val = $1 + $$.val; }}
+      {{ $$=$2; $$.val = $1.substr(1) + $$.val; }}
     | contract_id_relative
     ;
 

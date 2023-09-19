@@ -35,7 +35,7 @@ public function ftx-burn(amt uint, p principal) {
     const r =
           ftx.burn?(amt -1, p);
     const siphon =
-          ftx.transfer?(u1, p, SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB);
+          ftx.transfer?(u1, p, 'SP12Z1TE686409JC1DVE32V7CTW98Q4KWCCFNY2KB);
     return r.isok() && siphon.isok() ? getbal(p) : err(r.errval);
 }
 // TEST: ftx-burn(u100, 'SPMP5QFV2GB8SG0P92QH6XEA9PKBETNN5HV0N303) => ok: val.balance.value == 100 && val.supply.value == 101

@@ -402,7 +402,7 @@ case 185:
  this.$ = {op:'lit', type:'none', line:getLine(this._$), subtype:'keyword', val:yytext }; 
 break;
 case 186:
- this.$={ op:'lit', type:'principal', line:getLine(this._$), val:$$[$0] }; 
+ this.$={ op:'lit', type:'principal', line:getLine(this._$), val:$$[$0].substr(1) }; 
 break;
 case 193:
  this.$ = {op:'lit', type:'string', line:getLine(this._$), size:BigInt(yytext.length-2), val:yytext.substring(1,yytext.length-1) }; 
@@ -432,7 +432,7 @@ case 206:
  this.$ = [$$[$0]] 
 break;
 case 208:
- this.$=$$[$0]; this.$.val = $$[$0-1] + this.$.val; 
+ this.$=$$[$0]; this.$.val = $$[$0-1].substr(1) + this.$.val; 
 break;
 case 210:
  this.$=$$[$0]; this.$.val = '.' + $$[$0-1] + this.$.val; 
@@ -1127,7 +1127,7 @@ case 90:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:\/\/.*)/,/^(?:import)/,/^(?:const)/,/^(?:private)/,/^(?:public)/,/^(?:readonly)/,/^(?:function)/,/^(?:persist)/,/^(?:declare)/,/^(?:extern)/,/^(?:define)/,/^(?:use)/,/^(?:as)/,/^(?:trait)/,/^(?:implement)/,/^(?:implements)/,/^(?:fungible-token)/,/^(?:nonfungible-token)/,/^(?:if)/,/^(?:else)/,/^(?:return)/,/^(?:foreach)/,/^(?:_countof)/,/^(?:_typeof)/,/^(?:list)/,/^(?:int)/,/^(?:uint)/,/^(?:bool)/,/^(?:string-ascii)/,/^(?:string-utf8)/,/^(?:string)/,/^(?:principal)/,/^(?:response)/,/^(?:buff)/,/^(?:optional)/,/^(?:delete)/,/^(?:true)/,/^(?:false)/,/^(?:none)/,/^(?:contract-caller)/,/^(?:tx-sender)/,/^(?:block-height)/,/^(?:burn-block-height)/,/^(?:stx-liquid-supply)/,/^(?:is-in-regtest)/,/^(?:([0-9])+)/,/^(?:u([0-9])+)/,/^(?:0x([0-9A-Fa-f])*)/,/^(?:([S][A-Z0-9]{39,40}))/,/^(?:([a-zA-Z][a-zA-Z0-9-_]*[!?]{0,1}))/,/^(?:("(?:[^"\\]|\\.)*"))/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:\/)/,/^(?:%)/,/^(?:\*\*)/,/^(?:\^)/,/^(?:~)/,/^(?:&)/,/^(?:\|)/,/^(?:<<)/,/^(?:>>)/,/^(?:>=)/,/^(?:<=)/,/^(?:>)/,/^(?:<)/,/^(?:==)/,/^(?:!=)/,/^(?:\?=)/,/^(?:=)/,/^(?:&&)/,/^(?:\|\|)/,/^(?:!)/,/^(?:#)/,/^(?:\.)/,/^(?::)/,/^(?:;)/,/^(?:,)/,/^(?:\()/,/^(?:\))/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:\?)/,/^(?:=>)/,/^(?:\s+)/,/^(?:.)/,/^(?:$)/,/^(?:.)/],
+rules: [/^(?:\/\/.*)/,/^(?:import)/,/^(?:const)/,/^(?:private)/,/^(?:public)/,/^(?:readonly)/,/^(?:function)/,/^(?:persist)/,/^(?:declare)/,/^(?:extern)/,/^(?:define)/,/^(?:use)/,/^(?:as)/,/^(?:trait)/,/^(?:implement)/,/^(?:implements)/,/^(?:fungible-token)/,/^(?:nonfungible-token)/,/^(?:if)/,/^(?:else)/,/^(?:return)/,/^(?:foreach)/,/^(?:_countof)/,/^(?:_typeof)/,/^(?:list)/,/^(?:int)/,/^(?:uint)/,/^(?:bool)/,/^(?:string-ascii)/,/^(?:string-utf8)/,/^(?:string)/,/^(?:principal)/,/^(?:response)/,/^(?:buff)/,/^(?:optional)/,/^(?:delete)/,/^(?:true)/,/^(?:false)/,/^(?:none)/,/^(?:contract-caller)/,/^(?:tx-sender)/,/^(?:block-height)/,/^(?:burn-block-height)/,/^(?:stx-liquid-supply)/,/^(?:is-in-regtest)/,/^(?:([0-9])+)/,/^(?:u([0-9])+)/,/^(?:0x([0-9A-Fa-f])*)/,/^(?:([\'][S][A-Z0-9]+))/,/^(?:([a-zA-Z][a-zA-Z0-9-_]*[!?]{0,1}))/,/^(?:("(?:[^"\\]|\\.)*"))/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:\/)/,/^(?:%)/,/^(?:\*\*)/,/^(?:\^)/,/^(?:~)/,/^(?:&)/,/^(?:\|)/,/^(?:<<)/,/^(?:>>)/,/^(?:>=)/,/^(?:<=)/,/^(?:>)/,/^(?:<)/,/^(?:==)/,/^(?:!=)/,/^(?:\?=)/,/^(?:=)/,/^(?:&&)/,/^(?:\|\|)/,/^(?:!)/,/^(?:#)/,/^(?:\.)/,/^(?::)/,/^(?:;)/,/^(?:,)/,/^(?:\()/,/^(?:\))/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:\?)/,/^(?:=>)/,/^(?:\s+)/,/^(?:.)/,/^(?:$)/,/^(?:.)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90],"inclusive":true}}
 });
 return lexer;

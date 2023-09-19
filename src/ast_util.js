@@ -729,6 +729,11 @@ export function pretty_op(node) {
     return node.op;
 }
 
+export function pretty_principal(principal) {
+    if (/^\./.test(principal)) return principal;
+    return "'" + principal;
+}
+
 export function find_first_return(body) {
     var found = null;
     walk_cb(body, node => {

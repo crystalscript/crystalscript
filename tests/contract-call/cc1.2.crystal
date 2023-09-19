@@ -1,10 +1,10 @@
 
 import .cc11 from "./cc11.import" as basic1;
 
-import ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.cc11 from
+import 'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.cc11 from
        "./cc11.import" as basic1_1;
 
-declare extern ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.cc11 as basic1_2 {
+declare extern 'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.cc11 as basic1_2 {
     public function hello-times2(int) => response<int,>
 };
 

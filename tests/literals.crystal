@@ -19,9 +19,9 @@ public function fn() {
     const mymap = { k1:1, k2:"abc", k3:tx-sender, k5:u99, k6:false, k7:0x5600, k8:{ boo:"boo"} };
 
     const rel_contract_addr = .some-fn;
-    const abs_contract_addr = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.some-fun;
+    const abs_contract_addr = 'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.some-fun;
     const abs_contract_addr2 = principal("ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P.some-fun");
-    const stx_addr = ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P;
+    const stx_addr = 'ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P;
     const stx_addr2 = principal("ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P");
     const stx_addr3 = principal("ST26FVX16539KKXZKJN098Q08HRX3XBAP541MFS0P".ascii());
 
