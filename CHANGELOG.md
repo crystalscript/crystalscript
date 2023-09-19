@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+Version 0.3.3 (September 19, 2023)
+----------------------------------
+* Stacks address literals must now be preceded with apostrophe, the same as Clarity
+* Remove monobuild (webpack)
+
 Version 0.3.2 (April 14, 2023)
 -------------------------------
 * Allow statements at the top level (not in a function)
